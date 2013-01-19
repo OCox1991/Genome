@@ -1,2 +1,4 @@
 C:\Users\Owen\Documents\Work\C# Projects\Genome\Genome\Genome\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\Users\Owen\Documents\Work\C# Projects\Genome\Genome\Genome\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt

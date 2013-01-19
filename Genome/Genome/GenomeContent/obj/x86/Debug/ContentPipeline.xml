@@ -7,10 +7,10 @@
       <TargetProfile>HiDef</TargetProfile>
       <BuildConfiguration>Debug</BuildConfiguration>
       <CompressContent>false</CompressContent>
-      <RootDirectory>C:\Users\Owen\Documents\Work\C# Projects\Genome\Genome\GenomeContent\</RootDirectory>
-      <LoggerRootDirectory>C:\Users\Owen\Documents\Work\C# Projects\Genome\Genome\Genome\</LoggerRootDirectory>
-      <IntermediateDirectory>C:\Users\Owen\Documents\Work\C# Projects\Genome\Genome\GenomeContent\obj\x86\Debug\</IntermediateDirectory>
-      <OutputDirectory>C:\Users\Owen\Documents\Work\C# Projects\Genome\Genome\Genome\bin\x86\Debug\Content\</OutputDirectory>
+      <RootDirectory>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\GenomeContent\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\GenomeContent\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\</OutputDirectory>
     </Settings>
     <Assemblies>
       <Assembly>
