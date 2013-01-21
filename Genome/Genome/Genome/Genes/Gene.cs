@@ -7,10 +7,11 @@ namespace Genome
 {
     class Gene
     {
-        protected Cell[][] cells;
+        private Cell[][] cells;
         private ArrayList recognisedShapes;
         private ArrayList posMods;
         private ArrayList negMods;
+        private int[] colourCount;
 
         /// <summary>
         /// The empty constructor for the gene, which produces a random array of cells.
@@ -24,7 +25,8 @@ namespace Genome
                 cells[i] = new Cell[10];
                 for(int j = 1; j < cells[i].Length; j++)
                 {
-                    cells[i][j] = new Cell(r.Next(7), r.Next(7));
+                    int c = r.Next(7);
+                    cells[i][j] = new Cell(c, c);
                 }
             }
             this.init();
@@ -51,6 +53,7 @@ namespace Genome
             {
                 patternMatch(s);
             }
+            countColours();
         }
 
       
@@ -100,16 +103,36 @@ namespace Genome
             return getCell(row, col).getDomColour();
         }
 
+        /// <summary>
+        /// Gets a specified cell
+        /// </summary>
+        /// <param name="row">The row to find the cell in</param>
+        /// <param name="col">The column to find the cell in</param>
+        /// <returns>The cell found at the specified location</returns>
         public Cell getCell(int row, int col)
         {
             return cells[row][col];
         }
 
+        public ArrayList getPosMods()
+        {
+            return posMods;
+        }
+
+        public ArrayList getNegMods()
+        {
+            return negMods;
+        }
+
+        /// <summary>
+        /// Matches a given shape across the entire genome, adding the necessary posMods and negMods
+        /// </summary>
+        /// <param name="s">The shape to match across the whole genome</param>
         private void patternMatch(Shape s)
         {
-            for(int row = 0; row < cells.Length; row++)
+            for(int row = 0; row < cells.Length - 2; row++)
             {
-                for (int col = 0; col < cells.Length; col++)
+                for (int col = 0; col < cells.Length - 2; col++)
                 {
                     //add some check with Shape size here
                     if (cellMatch(s, row, col))
@@ -132,15 +155,24 @@ namespace Genome
         private Boolean cellMatch(Shape s, int row, int col)
         {
             Boolean isMatch = true;
-            for (int i = 0; i < 3; i++)
+            if (row > cells.Length - 2 || col > cells.Length - 2) //if we have gone far enough along that the matching would go off the edge
             {
-                for (int j = 0; j < 3; j++)
+                isMatch = false;
+            }
+
+            int i = 0;
+            int j = 0;
+            while(i < 3 && isMatch == true) //using while loops here to allow early termination if it doesn't match
+            {
+                while(j < 3 && isMatch == true)
                 {
                     if (s.getColour(i,j) != getColour(i,j) && s.getColour(i,j) != -1)
                     {
                         isMatch = false;
                     }
+                    j++;
                 }
+                i++;
             }
             return isMatch;
         }
@@ -224,6 +256,21 @@ namespace Genome
                 }
             }
             return maxColour;
+        }
+
+        /// <summary>
+        /// Counts the occurences of each colour in the genome, used for setting diet and colour for the creature
+        /// </summary>
+        public void countColours()
+        {
+            colourCount = new int[8]; //meaning it contains the numbers 1 to 7;
+            for (int r = 0; r < cells.Length; r++)
+            {
+                for (int c = 0; c < cells[r].Length; c++)
+                {
+                    colourCount[cells[r][c].getDomColour()]++; //increment the index of the array associated with the colour
+                }
+            }
         }
 
         #endregion

@@ -108,8 +108,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animals\Creature.cs" />
+    <Compile Include="Animals\Responses.cs" />
     <Compile Include="Genes\Cell.cs" />
     <Compile Include="Genes\Gene.cs" />
+    <Compile Include="Genes\ParamToken.cs" />
     <Compile Include="Genes\Shape.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
