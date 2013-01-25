@@ -25,6 +25,11 @@ namespace Genome
 
         private int stamina;
         private int maxStamina;
+
+        private int xLocation;
+        private int yLocation;
+
+        private WorldState world;
         #endregion
 
         #region scenarios
@@ -46,6 +51,8 @@ namespace Genome
         private void init()
         {
             colour = new int[3];
+            xLocation = -1;
+            yLocation = -1;
 
             //strength, speed, awareness, defence, stealthval
             //DEFAULT VALUES INITIALISATION
@@ -117,7 +124,7 @@ namespace Genome
         }
         #endregion
 
-        public void act()
+        public void tick()
         {
             //1. Rejuvenate
             if (health < maxHealth - ((maxHealth / 100) * Simulation.getHealthRegenSpeed()))
@@ -147,6 +154,57 @@ namespace Genome
             //4. Take action, stamina & energy penalties
         }
 
+        public void eat(FoodSource f)
+        {
+            f.beEaten();
+            if (f.isPlant())
+            {
+                energy += (int)(f.getFoodValue() * (1 - diet));
+            }
+            else
+            {
+                energy += (int)(f.getFoodValue() * diet);
+            }
+        }
+
+        public void damage(int damage)
+        {
+            //some reduction based on defence
+            health -= damage;
+        }
+
+        public void setLocation(int x, int y)
+        {
+            xLocation = x;
+            yLocation = y;
+        }
+
+        public void die()
+        {
+            world.killCreature(this);
+        }
+
+        public void attack(Creature otherCreature)
+        {
+
+        }
+
+        public void move(Direction dir)
+        {
+
+        }
+
+        public void moveTowards(int[] locationXY)
+        {
+
+        }
+
+        public int[] getLocation()
+        {
+            return new int[]{xLocation, yLocation};
+        }
         #endregion
+
+       
     }
 }

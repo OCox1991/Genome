@@ -116,6 +116,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="Simulation States\JudgingState.cs" />
+    <Compile Include="Simulation States\SimulationState.cs" />
+    <Compile Include="World\Direction.cs" />
+    <Compile Include="World\FoodSource.cs" />
+    <Compile Include="World\Obstacle.cs" />
+    <Compile Include="World\Plant.cs" />
+    <Compile Include="World\Remains.cs" />
+    <Compile Include="World\Tile.cs" />
+    <Compile Include="Simulation States\WorldState.cs" />
     <Compile Include="Simulation.cs" />
   </ItemGroup>
   <ItemGroup>
