@@ -26,11 +26,13 @@ namespace Genome
         private int stamina;
         private int maxStamina;
 
+        #endregion
+
         private int xLocation;
         private int yLocation;
 
         private WorldState world;
-        #endregion
+        
 
         #region scenarios
 

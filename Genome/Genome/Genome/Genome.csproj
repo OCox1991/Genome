@@ -130,6 +130,7 @@
   <ItemGroup>
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
+    <Content Include="Genes\Shapes.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GenomeContent\GenomeContent.contentproj">

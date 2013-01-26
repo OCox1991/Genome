@@ -1,0 +1,102 @@
+﻿Codes:
+STR = strength
+SPD = speed
+AWA = awareness
+DEF = defence
+HTH = health
+ENG = energy
+STL = stealth
+
+numbers 1-7 = colours
+A = any colour/wildcard
+
+Shapes format:
+3x3 square defining the shape, an empty line, followed by the stats granted by that shape, each on its own seperate line
+all changes related to a stat should be applied to it when it appears, it should not repeat. eg. don't write STR+ /line break/ STR+
+instead write STR++ and the same for minuses. After the stat block the next line should be ###
+
+###
+1AA
+A1A
+AA1
+
+STR+
+###
+2AA
+A2A
+AA2
+
+SPD+
+###
+3AA
+A3A
+AA3
+
+AWA+
+###
+4AA
+A4A
+AA4
+
+STL+
+###
+5AA
+A5A
+AA5
+
+DEF+
+###
+6AA
+A6A
+AA6
+
+HTH+
+###
+7AA
+A7A
+AA7
+
+ENG+
+###
+AA1
+A1A
+1AA
+
+STR-
+###
+AA2
+A2A
+2AA
+
+SPD-
+###
+AA3
+A3A
+3AA
+
+AWA-
+###
+AA4
+A4A
+4AA
+
+STL-
+###
+AA5
+A5A
+5AA
+
+DEF-
+###
+AA6
+A6A
+6AA
+
+ENG-
+###
+AA6
+A6A
+6AA
+
+HTH-
+###

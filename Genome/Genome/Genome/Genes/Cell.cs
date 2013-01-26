@@ -1,5 +1,4 @@
-﻿#define DEBUG
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -71,18 +70,5 @@ namespace Genome
             return col;
         }
         #endregion
-
-
-#if DEBUG
-        public static void main(String[] args)
-        {
-            int i = int.Parse(args[0]);
-            int j = int.Parse(args[1]);
-            Cell c = new Cell(i, j);
-            System.Console.WriteLine("dominant colour = " + c.dominantColour);
-            System.Console.WriteLine("recessive colour = " + c.nonDominantColour);
-            System.Console.WriteLine("expresses as = " + c.getDomColour());
-        }
-#endif
     }
 }

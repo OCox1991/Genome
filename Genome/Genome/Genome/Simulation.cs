@@ -22,8 +22,8 @@ namespace Genome
         private static SimulationState state;
 
         private static Color[] colourMap = { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo, Color.Violet }; //Remember this is from 0 to 6 so when drawing take 1 to get the desired colour.
-        private WorldState theWorld;
-        private Creature selectedCreature;
+        private static WorldState theWorld;
+        private static Creature selectedCreature;
 
         public Simulation()
         {
