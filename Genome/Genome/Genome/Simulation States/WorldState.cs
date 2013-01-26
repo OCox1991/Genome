@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Text;
@@ -19,11 +20,11 @@ namespace Genome
         private int worldX = 1000;
         private int worldY = 1000;
 
-        private ArrayList creatureList;
-        private ArrayList plantList;
-        private ArrayList remainsList;
+        private List<Creature> creatureList;
+        private List<Plant> plantList;
+        private List<Remains> remainsList;
 
-        private Stack deadList;
+        private Stack<Creature> deadList;
 
         private Random randomNumberGenerator;
         private int seed = 0;
@@ -36,12 +37,14 @@ namespace Genome
             Random r = new Random();
             seed = r.Next(100000);
             randomNumberGenerator = new Random(seed);
-            deadList = new Stack();
+            deadList = new Stack<Creature>();
             setUpWorld();
         }
 
         public void setUpWorld()
         {
+            plantList = new List<Plant>();
+            remainsList = new List<Remains>();
             tiles = new Tile[worldX][];
 
             for (int i = 0; i < worldX; i++)
@@ -70,8 +73,8 @@ namespace Genome
         /// </summary>
         public void addCreatures()
         {
-            
-            for (int i = 0; i < Simulation.getCreatureNumber(); i++)
+            creatureList = new List<Creature>();
+            for (int i = 0; i < Simulation.getPopulation(); i++)
             {
                 Creature c = new Creature();
                 creatureList.Add(c);
@@ -83,7 +86,7 @@ namespace Genome
         /// Adds a given list of creatures to the world
         /// </summary>
         /// <param name="creatures">The creatures to add to the world</param>
-        public void addCreatures(ArrayList creatures)
+        public void addCreatures(List<Creature> creatures)
         {
             creatureList = creatures;
             placeCreatures();
@@ -96,7 +99,7 @@ namespace Genome
         {
             for (int i = 0; i < creatureList.Count; i++)
             {
-                Creature c = (Creature)creatureList[i];
+                Creature c = creatureList[i];
                 int attempts = 0;
                 bool placed = false;
                 while (!placed && attempts < 5) //This is the number of times the program will attempt to place the creature before giving up

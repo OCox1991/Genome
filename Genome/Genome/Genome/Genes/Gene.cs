@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -8,9 +8,9 @@ namespace Genome
     class Gene
     {
         private Cell[][] cells;
-        private ArrayList recognisedShapes;
-        private ArrayList posMods;
-        private ArrayList negMods;
+        private static List<Shape> recognisedShapes;
+        private List<ParamToken> posMods;
+        private List<ParamToken> negMods;
         private int[] colourCount;
 
         /// <summary>
@@ -114,12 +114,12 @@ namespace Genome
             return cells[row][col];
         }
 
-        public ArrayList getPosMods()
+        public List<ParamToken> getPosMods()
         {
             return posMods;
         }
 
-        public ArrayList getNegMods()
+        public List<ParamToken> getNegMods()
         {
             return negMods;
         }

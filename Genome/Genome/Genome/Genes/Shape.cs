@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -10,11 +10,11 @@ namespace Genome
     /// </summary>
     class Shape
     {
-        ArrayList posMods;
-        ArrayList negMods;
+        List<ParamToken> posMods;
+        List<ParamToken> negMods;
         Cell[][] cells;
 
-        public Shape(Cell[][] cells, ArrayList posMods, ArrayList negMods)
+        public Shape(Cell[][] cells, List<ParamToken> posMods, List<ParamToken> negMods)
         {
             this.cells = cells;
             this.posMods = posMods;
@@ -26,7 +26,7 @@ namespace Genome
         /// Accessor method for the positive modifiers applied by this shape
         /// </summary>
         /// <returns>A list of tokens representing the positive modifiers applied by this shape</returns>
-        public ArrayList getPosMods()
+        public List<ParamToken> getPosMods()
         {
             return posMods;
         }
@@ -35,7 +35,7 @@ namespace Genome
         /// Accessor method for the negative modifiers applied by this shape
         /// </summary>
         /// <returns>A list of tokens representing the negative modifiers applied by this shape</returns>
-        public ArrayList getNegMods()
+        public List<ParamToken> getNegMods()
         {
             return negMods;
         }

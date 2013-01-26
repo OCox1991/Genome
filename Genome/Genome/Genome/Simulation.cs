@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -8,7 +8,7 @@ namespace Genome
 {
     class Simulation : Microsoft.Xna.Framework.Game
     {
-        private static ArrayList recognisedShapes = new ArrayList();
+        private static List<Shape> recognisedShapes = new List<Shape>();
         private static int energyDrainPerTick = 5;
         private static int staminaRejuvenationPercent = 5;
         private static int healthRejuvenationPercent = 5;
@@ -35,7 +35,7 @@ namespace Genome
         #region Methods
 
         #region Game rules related
-        public static ArrayList getShapes()
+        public static List<Shape> getShapes()
         {
             return recognisedShapes;
         }
@@ -86,11 +86,14 @@ namespace Genome
 
         protected override void Update(GameTime gameTime)
         {
+            base.Update(gameTime);
             state.update(gameTime);
         }
 
-        protected override void Draw()
+        protected override void  Draw(GameTime gameTime)
         {
+            base.Draw(gameTime);
+            //TODO: Add code for drawing top level menus and the like, things that will ALWAYS be present
             state.draw();
         }
 
