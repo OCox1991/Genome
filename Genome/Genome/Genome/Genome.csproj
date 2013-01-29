@@ -109,6 +109,7 @@
   <ItemGroup>
     <Compile Include="Animals\Creature.cs" />
     <Compile Include="Animals\Responses.cs" />
+    <Compile Include="Animals\Scenarios.cs" />
     <Compile Include="Genes\Cell.cs" />
     <Compile Include="Genes\Gene.cs" />
     <Compile Include="Genes\ParamToken.cs" />

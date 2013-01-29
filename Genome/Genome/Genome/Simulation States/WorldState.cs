@@ -65,7 +65,7 @@ namespace Genome
         /// </summary>
         private void populateWorld()
         {
-
+            
         }
 
         /// <summary>
@@ -97,31 +97,64 @@ namespace Genome
         /// </summary>
         private void placeCreatures()
         {
+            creatureList.Sort(sortCreaturesBySpeed);
             for (int i = 0; i < creatureList.Count; i++)
             {
                 Creature c = creatureList[i];
-                int attempts = 0;
-                bool placed = false;
-                while (!placed && attempts < 5) //This is the number of times the program will attempt to place the creature before giving up
-                {
-                    int xLoc = randomNumberGenerator.Next(worldX);
-                    int yLoc = randomNumberGenerator.Next(worldY);
-                    if (tileIsClear(yLoc, xLoc))
-                    {
-                        c.setLocation(xLoc, yLoc);
-                        getTile(yLoc, xLoc).addCreature(c);
-                        placed = true;
-                    }
-                    else
-                    {
-                        attempts++;
-                    }
-                }
-                if (!placed) //if it is not placed that means it must have tried the specified number and still failed. If that is the case then place the creature in the first free spot.
-                {
+                int[] clearTile = getRandomClearTile();
 
+                c.setLocation(clearTile[0], clearTile[1]);
+                getTile(clearTile[1], clearTile[0]).addCreature(c);
+            }
+        }
+
+        /// <summary>
+        /// Finds a random clear tile, or failing that, the next clear tile from the top left
+        /// </summary>
+        /// <returns>A randomly found clear tile or the next clear tile</returns>
+        private int[] getRandomClearTile()
+        {
+            int xLoc = -1;
+            int yLoc = -1;
+            int attempts = 0;
+            bool found = false;
+
+            while (!found && attempts < 5) //This is the number of times the program will attempt to place the creature before giving up
+            {
+                xLoc = randomNumberGenerator.Next(worldX);
+                yLoc = randomNumberGenerator.Next(worldY);
+                if (tileIsClear(yLoc, xLoc))
+                {
+                    found = true;
+                }
+                else
+                {
+                    attempts++;
                 }
             }
+            if (!found) //then find the top left most clear tile
+            {
+                xLoc = 0;
+                yLoc = 0;
+                while (!found)
+                {
+                    while (yLoc < tiles.Length)
+                    {
+                        while (xLoc < tiles[yLoc].Length)
+                        {
+                            xLoc++;
+                            if (tileIsClear(yLoc, xLoc))
+                            {
+                                xLoc--;
+                                yLoc--;
+                                found = true;
+                            }
+                        }
+                        yLoc++;
+                    }
+                }
+            }
+            return new int[] { xLoc, yLoc };
         }
 
         /// <summary>
@@ -132,7 +165,67 @@ namespace Genome
         /// <returns>A list of all the interesting things found in the scan</returns>
         public ArrayList scan(int[] locationXY, int radius)
         {
+            ArrayList a = new ArrayList();
+            a[0] = new List<Creature>();
+            a[1] = new List<Plant>();
+            a[2] = new List<Remains>();
+            a[3] = new List<Obstacle>();
 
+            int x = locationXY[0];
+            int y = locationXY[1];
+            for (int lookX = x - radius; lookX <= x + radius; lookX++)
+            {
+                if (lookX < 0)
+                {
+                    lookX = 0;
+                }
+                else if (lookX > worldX)
+                {
+                    lookX = x + radius + 1;
+                }
+                else
+                {
+                    for (int lookY = y - radius; lookY <= y + radius; lookY++)
+                    {
+                        if (lookY < 0)
+                        {
+                            lookY = 0;
+                        }
+                        else if (lookY > worldY)
+                        {
+                            lookY = y + radius + 1;
+                        }
+                        else
+                        {
+                            if (!tileIsClear(lookY, lookX))
+                            {
+                                Tile t = getTile(lookY, lookX);
+                                if (t.creaturePresent())
+                                {
+                                    List<Creature> lc = (List<Creature>)a[0];
+                                    lc.Add(t.getCreature());
+                                }
+                                else if (t.plantPresent())
+                                {
+                                    List<Plant> lp = (List<Plant>)a[1];
+                                    lp.Add(t.getPlant());
+                                }
+                                else if (t.remainsPresent())
+                                {
+                                    List<Remains> lr = (List<Remains>)a[2];
+                                    lr.Add(t.getRemains());
+                                }
+                                else if (t.obstaclePresent())
+                                {
+                                    List<Obstacle> lo = (List<Obstacle>)a[3];
+                                    lo.Add(t.getObstacle());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return a;
         }
 
         /// <summary>
@@ -162,9 +255,9 @@ namespace Genome
         /// </summary>
         public void tick()
         {
-            foreach (Creature c in creatureList)
+            for (int i = 0; i < creatureList.Count; i++ )
             {
-                c.tick();
+                creatureList[i].tick();
             }
             foreach (Plant p in plantList)
             {
@@ -175,7 +268,7 @@ namespace Genome
                 r.tick();
             }
 
-            //tick the simulation
+            Simulation.tick();
         }
 
         /// <summary>
@@ -189,6 +282,69 @@ namespace Genome
             c.setLocation(-1, -1);
             getTile(loc[1], loc[0]).addRemains(new Remains());
             deadList.Push(c);
+        }
+
+        /// <summary>
+        /// Gets the list of currently live creatures
+        /// </summary>
+        /// <returns>The list of live creatures</returns>
+        public List<Creature> getLiveCreatures()
+        {
+            return creatureList;
+        }
+
+        /// <summary>
+        /// Gets the list of currently dead creatures
+        /// </summary>
+        /// <returns>The list of dead creatures</returns>
+        public Stack<Creature> getDeadCreatures()
+        {
+            return deadList;
+        }
+
+        /// <summary>
+        /// A method to sort the creatures by their speed
+        /// </summary>
+        /// <returns></returns>
+        public static int sortCreaturesBySpeed(Creature c1, Creature c2)
+        {
+            int val = 0;
+            if (c1 == null && c2 == null)
+            {
+                val = 0;
+            }
+            else if (c1 == null)
+            {
+                val = -1;
+            }
+            else if (c2 == null)
+            {
+                val = 1;
+            }
+            else
+            {
+                if (c1.getSpeed() < c2.getSpeed())
+                {
+                    val = -1;
+                }
+                else if (c1.getSpeed() > c2.getSpeed())
+                {
+                    val = 1;
+                }
+                else
+                {
+                    val = 0;
+                }
+            }
+            return val;
+        }
+
+        public override void update(GameTime gameTime)
+        {
+            for (int i = 0; i < Simulation.getSpeed(); i++)
+            {
+                tick(); //tick x times based on the speed specified by the simulation
+            }
         }
     }
 }

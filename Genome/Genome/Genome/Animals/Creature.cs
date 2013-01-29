@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 
@@ -25,6 +26,8 @@ namespace Genome
 
         private int stamina;
         private int maxStamina;
+
+        private Dictionary<Scenario, Response> behaviour;
 
         #endregion
 
@@ -116,6 +119,31 @@ namespace Genome
             energy = initEnergy;
             maxStamina = energy / 10;
             stamina = maxStamina;
+
+            decideBehaviours();
+        }
+
+        private void decideBehaviours()
+        {
+            behaviour = new Dictionary<Scenario, Response>();
+            behaviour.Add(Scenario.NOTHING, Response.RANDOM);
+            Scenario[] scenarios = Scenario.NOTHING.AllScenarios();
+            Response[] responses = new Response[15];
+            int scenariosChecked = 0;
+            int i;
+            int j;
+            for (i = 1; i < dna.getSizeX(); i += 2)
+            {
+                for (j = 1; j < dna.getSizeY(); j += 2)
+                {
+                    responses[scenariosChecked] = scenarios[scenariosChecked].PossibleResponses()[dna.poll(i, j)];
+                }
+            }
+            for (i = 0; i < responses.Length; i++)
+            {
+                behaviour.Add(scenarios[i], responses[i]);
+            }
+
         }
 
         #region methods
@@ -123,6 +151,16 @@ namespace Genome
         public Gene getDna()
         {
             return dna;
+        }
+
+        public int[] getLocation()
+        {
+            return new int[] { xLocation, yLocation };
+        }
+
+        public int getSpeed()
+        {
+            return speed;
         }
         #endregion
 
@@ -151,9 +189,20 @@ namespace Genome
             energy -= Simulation.getEnergyDrainPerTick();
 
             //3. Decide on action, look around
+            ArrayList l = world.scan(getLocation(), awareness);
+            List<Creature> cl = (List<Creature>)l[0];
+            List<Plant> pl = (List<Plant>)l[1];
+            List<Remains> rl = (List<Remains>)l[2];
+            List<Obstacle> ol = (List<Obstacle>)l[3];
 
+            //decide what scenario applies
+
+            //get the response to the scenario from the behaviours dictionary
+
+            //repeat until some action is taken (since we might get an ignore responses)
 
             //4. Take action, stamina & energy penalties
+
         }
 
         public void eat(FoodSource f)
@@ -173,6 +222,10 @@ namespace Genome
         {
             //some reduction based on defence
             health -= damage;
+            if (health <= 0)
+            {
+                this.die();
+            }
         }
 
         public void setLocation(int x, int y)
@@ -199,11 +252,6 @@ namespace Genome
         public void moveTowards(int[] locationXY)
         {
 
-        }
-
-        public int[] getLocation()
-        {
-            return new int[]{xLocation, yLocation};
         }
         #endregion
 

@@ -21,6 +21,7 @@ namespace Genome
 
         private static SimulationState state;
 
+        private static int population = 1000;
         private static Color[] colourMap = { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo, Color.Violet }; //Remember this is from 0 to 6 so when drawing take 1 to get the desired colour.
         private static WorldState theWorld;
         private static Creature selectedCreature;
@@ -80,6 +81,10 @@ namespace Genome
             }
         }
 
+        public static int getPopulation()
+        {
+            return population;
+        }
         #endregion
 
         #region overriding methods to make the game work
@@ -90,7 +95,7 @@ namespace Genome
             state.update(gameTime);
         }
 
-        protected override void  Draw(GameTime gameTime)
+        protected override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
             //TODO: Add code for drawing top level menus and the like, things that will ALWAYS be present
