@@ -195,7 +195,97 @@ namespace Genome
             List<Remains> rl = (List<Remains>)l[2];
             List<Obstacle> ol = (List<Obstacle>)l[3];
 
-            //decide what scenario applies
+            Scenario s = Scenario.NOTHING;
+
+            int creatureCount = cl.Count;
+            int plantCount = pl.Count;
+            int remainsCount = rl.Count;
+            int foodCount = plantCount + remainsCount;
+
+            if(inCombat)
+            {
+                if (creatureCount > 1)
+                {
+                    s = Scenario.IN_COMBAT_CREATURE;
+                }
+                else if(maxHealth/health < Simulation.getWoundedHealthPercent())
+                {
+                    s = Scenario.IN_COMBAT_WOUNDED;
+                }
+                else
+                {
+                    s = Scenario.IN_COMBAT;
+                }
+            }
+            else if (creatureCount == 1)
+            {
+                if (foodCount > 0 && energy < Simulation.getStarvingEnergyLevel())
+                {
+                    s = Scenario.STARVING_CREATURE_FOOD;
+                }
+                else if (foodCount == 1)
+                {
+                    s = Scenario.CREATURE_FOOD;
+                }
+                else if (foodCount > 1)
+                {
+                    s = Scenario.CREATURE_MULT_FOOD;
+                }
+                else
+                {
+                    s = Scenario.CREATURE;
+                    if (behaviour[s] == Response.IGNORE)
+                    {
+                        s = Scenario.NOTHING;
+                    }
+                }
+            }
+            else if (creatureCount > 1)
+            {
+                if (foodCount > 0 && energy < Simulation.getStarvingEnergyLevel())
+                {
+                    s = Scenario.STARVING_MULT_CREATURE_FOOD;
+                }
+                else if (foodCount == 1)
+                {
+                    s = Scenario.MULT_CREATURE_FOOD;
+                }
+                else if (foodCount > 1)
+                {
+                    s = Scenario.MULT_CREATURE_MULT_FOOD;
+                }
+                else
+                {
+                    s = Scenario.MULT_CREATURE;
+                }
+            }
+            else if (foodCount == 1)
+            {
+                if (energy < Simulation.getStarvingEnergyLevel())
+                {
+                    s = Scenario.STARVING_FOOD;
+                    if (behaviour[s] == Response.EAT_PREFERRED)
+                    {
+                        //TODO: check if the food is the preferred type, then transition to either NOTHING or EAT
+                    }
+                }
+                else
+                {
+                    s = Scenario.FOOD;
+                    if (behaviour[s] == Response.EAT_PREFERRED)
+                    {
+                        //see above
+                    }
+                }
+            }
+            else if (foodCount > 0)
+            {
+                s = Scenario.MULT_FOOD;
+            }
+            else
+            {
+                s = Scenario.NOTHING;
+            }
 
             //get the response to the scenario from the behaviours dictionary
 
