@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Genome
 {
-    abstract class FoodSource
+    abstract class FoodSource : WorldObject
     {
         protected int foodRemaining; //these 3 will be set by each subclass since they need to be different for each
         protected int foodValue;

@@ -5,11 +5,10 @@ using System.Text;
 
 namespace Genome
 {
-    class Obstacle
+    class Obstacle : WorldObject
     {
         public Obstacle()
         {
-            //Do nothing, this is an empty class.
         }
     }
 }

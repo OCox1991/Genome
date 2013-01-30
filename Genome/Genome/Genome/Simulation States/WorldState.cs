@@ -278,9 +278,11 @@ namespace Genome
         public void killCreature(Creature c)
         {
             creatureList.Remove(c);
-            int[] loc = c.getLocation();
+            int[] loc = c.getLocationXY();
             c.setLocation(-1, -1);
-            getTile(loc[1], loc[0]).addRemains(new Remains());
+            Remains r = new Remains();
+            r.setLocation(loc[0], loc[1]);
+            getTile(loc[1], loc[0]).addRemains(r);
             deadList.Push(c);
         }
 

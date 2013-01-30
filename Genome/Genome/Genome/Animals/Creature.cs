@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Genome
 {
-    class Creature
+    class Creature : WorldObject
     {
         private Gene dna;
 
@@ -31,9 +31,6 @@ namespace Genome
 
         #endregion
 
-        private int xLocation;
-        private int yLocation;
-
         private WorldState world;
         
 
@@ -56,8 +53,7 @@ namespace Genome
         private void init()
         {
             colour = new int[3];
-            xLocation = -1;
-            yLocation = -1;
+            setLocation(-1, -1);
 
             //strength, speed, awareness, defence, stealthval
             //DEFAULT VALUES INITIALISATION
@@ -153,11 +149,6 @@ namespace Genome
             return dna;
         }
 
-        public int[] getLocation()
-        {
-            return new int[] { xLocation, yLocation };
-        }
-
         public int getSpeed()
         {
             return speed;
@@ -189,7 +180,7 @@ namespace Genome
             energy -= Simulation.getEnergyDrainPerTick();
 
             //3. Decide on action, look around
-            ArrayList l = world.scan(getLocation(), awareness);
+            ArrayList l = world.scan(getLocationXY(), awareness);
             List<Creature> cl = (List<Creature>)l[0];
             List<Plant> pl = (List<Plant>)l[1];
             List<Remains> rl = (List<Remains>)l[2];
@@ -201,6 +192,7 @@ namespace Genome
             int plantCount = pl.Count;
             int remainsCount = rl.Count;
             int foodCount = plantCount + remainsCount;
+            WorldObject trackingObject = null;
 
             if(inCombat)
             {
@@ -234,10 +226,6 @@ namespace Genome
                 else
                 {
                     s = Scenario.CREATURE;
-                    if (behaviour[s] == Response.IGNORE)
-                    {
-                        s = Scenario.NOTHING;
-                    }
                 }
             }
             else if (creatureCount > 1)
@@ -287,9 +275,7 @@ namespace Genome
                 s = Scenario.NOTHING;
             }
 
-            //get the response to the scenario from the behaviours dictionary
-
-            //repeat until some action is taken (since we might get an ignore responses)
+            //get response based on scenario. Have a loop to keep trying to get an action until one is taken
 
             //4. Take action, stamina & energy penalties
 
@@ -318,12 +304,6 @@ namespace Genome
             }
         }
 
-        public void setLocation(int x, int y)
-        {
-            xLocation = x;
-            yLocation = y;
-        }
-
         public void die()
         {
             world.killCreature(this);
@@ -336,10 +316,36 @@ namespace Genome
 
         public void move(Direction dir)
         {
-
+            world.clearTile(getLocationXY()[0], getLocationXY()[1]);
+            switch (dir)
+            {
+                case Direction.SOUTH: setLocation(getLocationXY()[0], getLocationXY()[1] + 1); 
+                    break;
+                case Direction.SOUTHEAST: setLocation(getLocationXY()[0] + 1, getLocationXY()[1] + 1);
+                    break;
+                case Direction.EAST: setLocation(getLocationXY()[0] + 1, getLocationXY()[1]);
+                    break;
+                case Direction.NORTHEAST: setLocation(getLocationXY()[0] + 1, getLocationXY()[1] - 1);
+                    break;
+                case Direction.NORTH: setLocation(getLocationXY()[0], getLocationXY()[1] -1);
+                    break;
+                case Direction.NORTHWEST: setLocation(getLocationXY()[0] - 1, getLocationXY()[1] - 1);
+                    break;
+                case Direction.WEST: setLocation(getLocationXY()[0], getLocationXY()[1] - 1);
+                    break;
+                case Direction.SOUTHWEST: setLocation(getLocationXY()[0] - 1, getLocationXY()[1] + 1);
+                    break;
+            }
+            world.addCreature(getLocationXY()[0], getLocationXY()[1], this);
         }
 
-        public void moveTowards(int[] locationXY)
+        public void moveTowards(WorldObject thing)
+        {
+            Direction d = getDirectionTo(thing);
+            move(d);
+        }
+
+        public void evade(List<WorldObject> things)
         {
 
         }

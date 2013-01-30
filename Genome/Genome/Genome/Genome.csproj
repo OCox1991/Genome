@@ -118,7 +118,7 @@
     <Compile Include="Game1.cs" />
     <Compile Include="Simulation States\JudgingState.cs" />
     <Compile Include="Simulation States\SimulationState.cs" />
-    <Compile Include="WorldObject.cs" />
+    <Compile Include="World\WorldObject.cs" />
     <Compile Include="World\Direction.cs" />
     <Compile Include="World\FoodSource.cs" />
     <Compile Include="World\Obstacle.cs" />
