@@ -273,6 +273,16 @@ namespace Genome
             }
         }
 
+        public int getSizeX()
+        {
+            return cells.Length;
+        }
+
+        public int getSizeY()
+        {
+            return cells[0].Length;
+        }
+
         #endregion
     }
 }

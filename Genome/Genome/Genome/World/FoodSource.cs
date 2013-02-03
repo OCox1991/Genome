@@ -76,6 +76,6 @@ namespace Genome
         /// <summary>
         /// An abstract method that must be overridden, handles what will happen each set of ticks.
         /// </summary>
-        protected abstract void act();
+        public abstract void act();
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Text;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -19,6 +18,9 @@ namespace Genome
         private Tile[][] tiles;
         private int worldX = 1000;
         private int worldY = 1000;
+
+        private WorldDrawer drawer;
+        private WorldInputHandler inputHandler;
 
         private List<Creature> creatureList;
         private List<Plant> plantList;
@@ -202,8 +204,7 @@ namespace Genome
                                 Tile t = getTile(lookY, lookX);
                                 if (t.creaturePresent())
                                 {
-                                    List<Creature> lc = (List<Creature>)a[0];
-                                    lc.Add(t.getCreature());
+                                    Creature c = t.getCreature();
                                 }
                                 else if (t.plantPresent())
                                 {
@@ -240,6 +241,17 @@ namespace Genome
         }
 
         /// <summary>
+        /// Adds a creature at the specified location
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="c"></param>
+        public void addCreature(int x, int y, Creature c)
+        {
+            getTile(y, x).addCreature(c);
+        }
+
+        /// <summary>
         /// Checks if a specified tile is clear
         /// </summary>
         /// <param name="row">The row index of the specified tile</param>
@@ -255,10 +267,6 @@ namespace Genome
         /// </summary>
         public void tick()
         {
-            for (int i = 0; i < creatureList.Count; i++ )
-            {
-                creatureList[i].tick();
-            }
             foreach (Plant p in plantList)
             {
                 p.tick();
@@ -266,6 +274,17 @@ namespace Genome
             foreach (Remains r in remainsList)
             {
                 r.tick();
+                if (r.fullyDecayed())
+                {
+                    int[] xy = r.getLocationXY();
+                    getTile(xy[1], xy[0]).clearTile();
+                    remainsList.Remove(r);
+                    r.setLocation(-1, -1);
+                }
+            }
+            for (int i = 0; i < creatureList.Count; i++)
+            {
+                creatureList[i].tick();
             }
 
             Simulation.tick();
@@ -277,10 +296,12 @@ namespace Genome
         /// <param name="c">The creature to kill</param>
         public void killCreature(Creature c)
         {
-            creatureList.Remove(c);
             int[] loc = c.getLocationXY();
+            creatureList.Remove(c);
+            getTile(loc[1], loc[0]).clearTile();
             c.setLocation(-1, -1);
-            Remains r = new Remains();
+
+            Remains r = new Remains(randomNumberGenerator);
             r.setLocation(loc[0], loc[1]);
             getTile(loc[1], loc[0]).addRemains(r);
             deadList.Push(c);
@@ -302,6 +323,38 @@ namespace Genome
         public Stack<Creature> getDeadCreatures()
         {
             return deadList;
+        }
+
+        /// <summary>
+        /// Checks if there is a creature in a specified tile
+        /// </summary>
+        /// <param name="x">The x index of the tile to look at</param>
+        /// <param name="y">The y index of the tile to look at</param>
+        /// <returns></returns>
+        public bool creatureAt(int x, int y)
+        {
+            return getTile(y, x).creaturePresent();
+        }
+
+        /// <summary>
+        /// Gets the creature in a specified tile
+        /// </summary>
+        /// <param name="x">The x index of the tile</param>
+        /// <param name="y">The y index of the tile</param>
+        /// <returns></returns>
+        public Creature getCreatureAt(int x, int y)
+        {
+            return getTile(y, x).getCreature();
+        }
+
+        /// <summary>
+        /// Clears a specified tile, removing all of its contents
+        /// </summary>
+        /// <param name="x">The x index of the tile</param>
+        /// <param name="y">The y index of the tile</param>
+        public void clearTile(int x, int y)
+        {
+            getTile(y, x).clearTile();
         }
 
         /// <summary>
@@ -347,6 +400,12 @@ namespace Genome
             {
                 tick(); //tick x times based on the speed specified by the simulation
             }
+            inputHandler.update(gameTime);
+        }
+
+        public override void draw()
+        {
+            drawer.draw();
         }
     }
 }

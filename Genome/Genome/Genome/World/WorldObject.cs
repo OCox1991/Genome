@@ -31,7 +31,18 @@ namespace Genome
         /// <returns>The distance as an int</returns>
         public int getDistanceFrom(WorldObject o)
         {
-            return Math.Abs(this.getLocationXY()[0] - o.getLocationXY()[0]) + Math.Abs(this.getLocationXY()[1] - o.getLocationXY()[1]);
+            int[] xy = getRelativeLocation(o);
+
+            return Math.Abs(xy[0]) + Math.Abs(xy[1]);
+        }
+
+        public double getEuclideanDistanceFrom(WorldObject o)
+        {
+            int[] xy = getRelativeLocation(o);
+            int a2 = xy[0] * xy[0];
+            int b2 = xy[1] * xy[1];
+
+            return Math.Sqrt(a2 + b2);
         }
 
         public int[] getRelativeLocation(WorldObject o)
@@ -117,6 +128,19 @@ namespace Genome
                 }
             }
             return d;
+        }
+
+        public bool isAdjacent(WorldObject o)
+        {
+            int[] loc = o.getRelativeLocation(o);
+            int locX = loc[0];
+            int locY = loc[1];
+            bool b = false;
+            if (Math.Abs(locX) <= 1 && Math.Abs(locY) <= 1)
+            {
+                b = true;
+            }
+            return b;
         }
     }
 }

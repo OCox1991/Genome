@@ -9,6 +9,12 @@ namespace Genome
     class Creature : WorldObject
     {
         private Gene dna;
+        private WorldState world;
+
+        private bool inCombat;
+        private bool stealth;
+        private Creature inCombatWith;
+
 
         #region stats
         private int health;
@@ -31,13 +37,6 @@ namespace Genome
 
         #endregion
 
-        private WorldState world;
-        
-
-        #region scenarios
-
-        #endregion
-
         public Creature()
         {
             dna = new Gene();
@@ -52,8 +51,12 @@ namespace Genome
 
         private void init()
         {
+            world = Simulation.getCurrentWorld();
             colour = new int[3];
             setLocation(-1, -1);
+
+            inCombat = false;
+            stealth = false;
 
             //strength, speed, awareness, defence, stealthval
             //DEFAULT VALUES INITIALISATION
@@ -132,7 +135,7 @@ namespace Genome
             {
                 for (j = 1; j < dna.getSizeY(); j += 2)
                 {
-                    responses[scenariosChecked] = scenarios[scenariosChecked].PossibleResponses()[dna.poll(i, j)];
+                    responses[scenariosChecked] = scenarios[scenariosChecked].PossibleResponses()[dna.poll(i, j) - 1] ; //- 1 here since colours are 1 to 7 and possible responses are 0 to 6
                 }
             }
             for (i = 0; i < responses.Length; i++)
@@ -143,10 +146,35 @@ namespace Genome
         }
 
         #region methods
-        #region accessor
+        #region accessor methods
         public Gene getDna()
         {
             return dna;
+        }
+
+        public int getDefence()
+        {
+            return defence;
+        }
+
+        public int getHealth()
+        {
+            return health;
+        }
+
+        public int getStealthVal()
+        {
+            return stealthVal;
+        }
+
+        public int getStrength()
+        {
+            return strength;
+        }
+
+        public bool isStealthy()
+        {
+            return stealth;
         }
 
         public int getSpeed()
@@ -157,7 +185,7 @@ namespace Genome
 
         public void tick()
         {
-            //1. Rejuvenate
+            #region 1. Rejuvenate
             if (health < maxHealth - ((maxHealth / 100) * Simulation.getHealthRegenSpeed()))
             {
                 health += ((maxHealth / 100) * Simulation.getHealthRegenSpeed());
@@ -175,17 +203,18 @@ namespace Genome
             {
                 stamina = maxStamina;
             }
-
-            //2. Drain energy
+            #endregion
+            #region 2. Drain energy
             energy -= Simulation.getEnergyDrainPerTick();
-
-            //3. Decide on action, look around
+            #endregion
+            #region 3. Look Around
             ArrayList l = world.scan(getLocationXY(), awareness);
             List<Creature> cl = (List<Creature>)l[0];
             List<Plant> pl = (List<Plant>)l[1];
             List<Remains> rl = (List<Remains>)l[2];
             List<Obstacle> ol = (List<Obstacle>)l[3];
-
+            #endregion
+            #region 4. Do Something
             Scenario s = Scenario.NOTHING;
 
             int creatureCount = cl.Count;
@@ -193,9 +222,27 @@ namespace Genome
             int remainsCount = rl.Count;
             int foodCount = plantCount + remainsCount;
             WorldObject trackingObject = null;
+            List<WorldObject> trackingObjects = null;
+            Response resp = Response.RANDOM;
+
+            foreach (Creature c in cl)
+            {
+                if (c.isStealthy())
+                {
+                    if (!canSee(c))
+                    {
+                        cl.Remove(c);
+                    }
+                    else
+                    {
+                        c.spotted();
+                    }
+                }
+            }
 
             if(inCombat)
             {
+                #region combat
                 if (creatureCount > 1)
                 {
                     s = Scenario.IN_COMBAT_CREATURE;
@@ -208,9 +255,11 @@ namespace Genome
                 {
                     s = Scenario.IN_COMBAT;
                 }
+                #endregion
             }
             else if (creatureCount == 1)
             {
+                #region single creature
                 if (foodCount > 0 && energy < Simulation.getStarvingEnergyLevel())
                 {
                     s = Scenario.STARVING_CREATURE_FOOD;
@@ -227,9 +276,12 @@ namespace Genome
                 {
                     s = Scenario.CREATURE;
                 }
+                resp = behaviour[s];
+                #endregion
             }
             else if (creatureCount > 1)
             {
+                #region multi creature
                 if (foodCount > 0 && energy < Simulation.getStarvingEnergyLevel())
                 {
                     s = Scenario.STARVING_MULT_CREATURE_FOOD;
@@ -246,51 +298,365 @@ namespace Genome
                 {
                     s = Scenario.MULT_CREATURE;
                 }
+                #endregion
             }
-            else if (foodCount == 1)
+            else if (foodCount == 1) //1 food visible
             {
-                if (energy < Simulation.getStarvingEnergyLevel())
+                #region single food
+                //set up tracking object
+                if (pl.Count == 0) //if not plant
                 {
-                    s = Scenario.STARVING_FOOD;
-                    if (behaviour[s] == Response.EAT_PREFERRED)
+                    trackingObject = rl[0];
+                }
+                else //if plant
+                {
+                    trackingObject = pl[0];
+                }
+                
+                if (energy < Simulation.getStarvingEnergyLevel()) //check if the scenario is for starving or not starving
+                {
+                    s = Scenario.STARVING_FOOD; //set scenario
+                    resp = behaviour[s];
+
+                    if (resp == Response.EAT_PREFERRED) //deal with conditional responses
                     {
-                        //TODO: check if the food is the preferred type, then transition to either NOTHING or EAT
+                        eatPreferred((FoodSource)trackingObject);
+                    }
+                    else
+                    {
+                        eat((FoodSource)trackingObject);
                     }
                 }
-                else
+                else //if not starving
                 {
                     s = Scenario.FOOD;
-                    if (behaviour[s] == Response.EAT_PREFERRED)
+                    resp = behaviour[s];
+
+                    if (resp == Response.EAT_PREFERRED) //deal with conditional responses
                     {
-                        //see above
+                        eatPreferred((FoodSource)trackingObject);
+                    }
+                    else
+                    {
+                        eat((FoodSource)trackingObject);
                     }
                 }
+                #endregion
+                //DONE
             }
             else if (foodCount > 0)
             {
+                #region multi food
                 s = Scenario.MULT_FOOD;
+                #endregion
             }
             else
             {
                 s = Scenario.NOTHING;
             }
+            #endregion
+        }
 
-            //get response based on scenario. Have a loop to keep trying to get an action until one is taken
+        /// <summary>
+        /// A method used to check if you can detect a creature that is trying to be stealthy
+        /// </summary>
+        /// <param name="c">The creature in the scan radius that we are checking we can see</param>
+        /// <returns>True if the creature is not hidden, false if the creature is hidden</returns>
+        private bool canSee(Creature c)
+        {
+            Random r = new Random();
+            bool b = true;
+            if(r.Next(100) < c.getStealthVal() + (getEuclideanDistanceFrom(c) - awareness))
+            {
+                b = false;
+            }
+            return b;
+        }
 
-            //4. Take action, stamina & energy penalties
+        #region sorting methods
+        private WorldObject getClosest(List<WorldObject> stuff)
+        {
+            int dist = int.MaxValue;
+            WorldObject closest = null;
 
+            foreach(WorldObject w in stuff)
+            {
+                int d = getDistanceFrom(w);
+                if(d < dist)
+                {
+                    dist = d;
+                    closest = w;
+                }
+            }
+            return closest;
+        }
+
+        private WorldObject getFurthest(List<WorldObject> stuff)
+        {
+            int dist = 0;
+            WorldObject furthest = null;
+
+            foreach(WorldObject w in stuff)
+            {
+                int d = getDistanceFrom(w);
+                if(d > dist)
+                {
+                    dist = d;
+                    furthest = w;
+                }
+            }
+            return furthest;
+        }
+
+        private Creature getWeakest(List<Creature> creatures)
+        {
+            int lowestStr = int.MaxValue;
+            Creature weakest = null;
+            foreach (Creature c in creatures)
+            {
+                int str = c.getStrength();
+                if (str < lowestStr)
+                {
+                    lowestStr = str;
+                    weakest = c;
+                }
+            }
+            return weakest;
+        }
+
+        private Creature getSlowest(List<Creature> creatures)
+        {
+            int lowestSpeed = int.MaxValue;
+            Creature slowest = null;
+            foreach (Creature c in creatures)
+            {
+                int spd = c.getStrength();
+                if (spd < lowestSpeed)
+                {
+                    lowestSpeed = spd;
+                    slowest = c;
+                }
+            }
+            return slowest;
+        }
+
+        private Creature getWounded(List<Creature> creatures)
+        {
+            int lowestHealth = int.MaxValue;
+            Creature wounded = null;
+            foreach (Creature c in creatures)
+            {
+                int hth = c.getHealth();
+                if (hth < lowestHealth)
+                {
+                    lowestHealth = hth;
+                    wounded = c;
+                }
+            }
+            return wounded;
+        }
+
+        private Creature getLeastDefended(List<Creature> creatures)
+        {
+            int lowestDef = int.MaxValue;
+            Creature leastDefended = null;
+            foreach (Creature c in creatures)
+            {
+                int def = c.getDefence();
+                if (def < lowestDef)
+                {
+                    lowestDef = def;
+                    leastDefended = c;
+                }
+            }
+            return leastDefended;
+        }
+
+        private Creature getMostHungry(List<Creature> creatures)
+        {
+            int lowestEnergy = int.MaxValue;
+            Creature hungriest = null;
+            foreach (Creature c in creatures)
+            {
+                int eng = c.getStrength();
+                if (eng < lowestEnergy)
+                {
+                    lowestEnergy = eng;
+                    hungriest = c;
+                }
+            }
+            return hungriest;
+        }
+
+        private FoodSource getMostNourishing(List<FoodSource> food)
+        {
+            int mostNourishment = 0;
+            FoodSource ret = null;
+            foreach (FoodSource f in food)
+            {
+                int n = getNourishmentAmt(f);
+                if (n > mostNourishment)
+                {
+                    mostNourishment = n;
+                    ret = f;
+                }
+            }
+            return ret;
+        }
+
+        private int getNourishmentAmt(FoodSource f)
+        {
+            int ret = 0;
+            if (f.isPlant())
+            {
+                ret = (int)(f.getFoodValue() * (1 - diet));
+            }
+            else
+            {
+                ret = (int)(f.getFoodValue() * diet);
+            }
+            return ret;
+        }
+
+        private FoodSource getMostRemaining(List<FoodSource> food)
+        {
+            int mostRemaining = -1;
+            FoodSource retFood = null;
+            foreach (FoodSource f in food)
+            {
+                if (f.getFoodRemaining() > mostRemaining)
+                {
+                    mostRemaining = f.getFoodRemaining();
+                    retFood = f;
+                }
+            }
+            return retFood;
+        }
+
+        private FoodSource getLeastDangerous(List<FoodSource> food, List<Creature> creatures)
+        {
+            int leastDanger = int.MaxValue;
+            FoodSource retFood = null;
+            foreach (FoodSource f in food)
+            {
+                int danger = getDanger(f, creatures);
+                if (danger < leastDanger)
+                {
+                    leastDanger = danger;
+                    retFood = f;
+                }
+            }
+            return retFood;
+        }
+
+        private int getDanger(FoodSource f, List<Creature> creatures)
+        {
+            int danger = 0;
+            foreach (Creature c in creatures)
+            {
+                danger += f.getDistanceFrom(c);
+            }
+            return danger;
+        }
+
+        private FoodSource getClosestPreferred(List<FoodSource> food)
+        {
+            int leastDist = int.MaxValue;
+            FoodSource retFood = null;
+            foreach (FoodSource f in food)
+            {
+                if (foodIsPreferred(f))
+                {
+                    int d = getDistanceFrom(f);
+                    if (d < leastDist)
+                    {
+                        leastDist = d;
+                        retFood = f;
+                    }
+                }
+                else
+                {
+                    food.Remove(f);
+                }
+            }
+            return retFood;
+        }
+
+        private FoodSource getLeastRemaining(List<FoodSource> food)
+        {
+            int leastRemaining = int.MaxValue;
+            FoodSource retFood = null;
+            foreach (FoodSource f in food)
+            {
+                if (f.getFoodRemaining() < leastRemaining)
+                {
+                    leastRemaining = f.getFoodRemaining();
+                    retFood = f;
+                }
+            }
+            return retFood;
+        }
+
+        private FoodSource getMostEfficient(List<FoodSource> food)
+        {
+            double efficiency = 0.0;
+            FoodSource retFood = null;
+            foreach (FoodSource f in food)
+            {
+                double fEfficiency = getNourishmentAmt(f) / getDistanceFrom(f);
+                if (fEfficiency > efficiency)
+                {
+                    efficiency = fEfficiency;
+                    retFood = f;
+                }
+            }
+            return retFood;
+
+        }
+
+        #endregion
+
+        #region action methods
+        private bool foodIsPreferred(FoodSource f)
+        {
+            bool b = false;
+            if (f.isPlant() && diet * 2 <= 1)
+            {
+                b = true;
+            }
+            else if (!f.isPlant() && diet * 2 > 1)
+            {
+                b = true;
+            }
+            else
+            {
+                b = false;
+            }
+            return b;
+        }
+
+        public void attacked(Creature c)
+        {
+            inCombat = true;
+            inCombatWith = c;
+        }
+
+        public void outOfCombat()
+        {
+            inCombat = false;
+            inCombatWith = null;
         }
 
         public void eat(FoodSource f)
         {
-            f.beEaten();
-            if (f.isPlant())
+            if (isAdjacent(f))
             {
-                energy += (int)(f.getFoodValue() * (1 - diet));
+                f.beEaten();
+                energy += getNourishmentAmt(f);
             }
             else
             {
-                energy += (int)(f.getFoodValue() * diet);
+                moveTowards(f);
             }
         }
 
@@ -309,37 +675,75 @@ namespace Genome
             world.killCreature(this);
         }
 
+        private bool eatPreferred(FoodSource f)
+        {
+            bool b = foodIsPreferred(f);
+            if (b)
+            {
+                eat(f);
+            }
+            return b;
+        }
+
         public void attack(Creature otherCreature)
         {
+            if (isAdjacent(otherCreature))
+            {
+                otherCreature.attacked(this);
+                inCombat = true;
+                inCombatWith = otherCreature;
+            }
+            else
+            {
+                moveTowards(otherCreature);
+            }
+        }
 
+        public void hide()
+        {
+            stealth = true;
+        }
+
+        public void spotted()
+        {
+            stealth = false;
         }
 
         public void move(Direction dir)
         {
-            world.clearTile(getLocationXY()[0], getLocationXY()[1]);
+            int[] newLoc = null;
+            //add combat checking
             switch (dir)
             {
-                case Direction.SOUTH: setLocation(getLocationXY()[0], getLocationXY()[1] + 1); 
+                case Direction.SOUTH: newLoc = new int[]{getLocationXY()[0], getLocationXY()[1] + 1}; 
                     break;
-                case Direction.SOUTHEAST: setLocation(getLocationXY()[0] + 1, getLocationXY()[1] + 1);
+                case Direction.SOUTHEAST: newLoc = new int[]{getLocationXY()[0] + 1, getLocationXY()[1] + 1};
                     break;
-                case Direction.EAST: setLocation(getLocationXY()[0] + 1, getLocationXY()[1]);
+                case Direction.EAST: newLoc = new int[]{getLocationXY()[0] + 1, getLocationXY()[1]};
                     break;
-                case Direction.NORTHEAST: setLocation(getLocationXY()[0] + 1, getLocationXY()[1] - 1);
+                case Direction.NORTHEAST: newLoc = new int[]{getLocationXY()[0] + 1, getLocationXY()[1] - 1};
                     break;
-                case Direction.NORTH: setLocation(getLocationXY()[0], getLocationXY()[1] -1);
+                case Direction.NORTH: newLoc = new int[]{getLocationXY()[0], getLocationXY()[1] -1};
                     break;
-                case Direction.NORTHWEST: setLocation(getLocationXY()[0] - 1, getLocationXY()[1] - 1);
+                case Direction.NORTHWEST: newLoc = new int[]{getLocationXY()[0] - 1, getLocationXY()[1] - 1};
                     break;
-                case Direction.WEST: setLocation(getLocationXY()[0], getLocationXY()[1] - 1);
+                case Direction.WEST: newLoc = new int[]{getLocationXY()[0], getLocationXY()[1] - 1};
                     break;
-                case Direction.SOUTHWEST: setLocation(getLocationXY()[0] - 1, getLocationXY()[1] + 1);
+                case Direction.SOUTHWEST: newLoc = new int[]{getLocationXY()[0] - 1, getLocationXY()[1] + 1};
                     break;
             }
-            world.addCreature(getLocationXY()[0], getLocationXY()[1], this);
+            if (world.tileIsClear(newLoc[1], newLoc[0]))
+            {
+                world.clearTile(getLocationXY()[1], getLocationXY()[0]);
+                world.addCreature(getLocationXY()[0], getLocationXY()[1], this);
+            }
+            else if (world.creatureAt(getLocationXY()[1], getLocationXY()[0]))
+            {
+                world.getCreatureAt(getLocationXY()[1], getLocationXY()[0]).spotted();
+            }
         }
 
-        public void moveTowards(WorldObject thing)
+        public void moveTowards(WorldObject thing) //TODO: Add speed stuff for no. of moves
         {
             Direction d = getDirectionTo(thing);
             move(d);
@@ -350,7 +754,8 @@ namespace Genome
 
         }
         #endregion
+        #endregion
 
-       
+
     }
 }

@@ -62,7 +62,21 @@ namespace Genome
             isBlocked = true;
         }
 
-        //...
+        public Remains getRemains()
+        {
+            return remains;
+        }
+
+        public void addObstacle()
+        {
+            obstacle = new Obstacle();
+            isBlocked = true;
+        }
+
+        public Obstacle getObstacle()
+        {
+            return obstacle;
+        }
 
         public bool isEmpty()
         {

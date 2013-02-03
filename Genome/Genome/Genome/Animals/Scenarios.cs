@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Genome
 {
-    enum Scenario
+    public enum Scenario
     {
         NOTHING, //USED WHEN KEEPING TRACK OF SCENARIOS IN CREATURE
 
@@ -26,7 +26,7 @@ namespace Genome
         DEPLETED_PLANT,
     }
 
-    enum Response
+    public enum Response
     {
         //SEEING CREATURE(S) + FOOD
         IGNORE_FOOD_NON_PREFERRED,
@@ -90,7 +90,7 @@ namespace Genome
                     break;
                 case Scenario.STARVING_FOOD: responses = new Response[] { Response.EAT, Response.EAT, Response.EAT, Response.EAT, Response.EAT, Response.EAT_PREFERRED, Response.EAT_PREFERRED }; 
                     break;
-                case Scenario.CREATURE_FOOD: responses = new Response[] { Response.ATTACK, Response.EVADE, Response.HIDE, Response.EAT_PREFERRED, Response.IGNORE_CREATURE, Response.IGNORE_FOOD, Response.IGNORE_FOOD_NON_PREFERRED }; 
+                case Scenario.CREATURE_FOOD: responses = new Response[] { Response.ATTACK, Response.EVADE, Response.HIDE, Response.IGNORE_FOOD_NON_PREFERRED, Response.IGNORE_CREATURE, Response.IGNORE_FOOD, Response.IGNORE_FOOD_NON_PREFERRED }; 
                     break;
                 case Scenario.STARVING_CREATURE_FOOD: responses = new Response[] { Response.ATTACK, Response.IGNORE_CREATURE, Response.IGNORE_CREATURE, Response.IGNORE_FOOD, Response.IGNORE_FOOD_NON_PREFERRED, Response.HIDE, Response.IGNORE_CREATURE }; 
                     break;
