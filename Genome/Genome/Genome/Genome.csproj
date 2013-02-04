@@ -113,6 +113,11 @@
     <Compile Include="Genes\Gene.cs" />
     <Compile Include="Genes\ParamToken.cs" />
     <Compile Include="Genes\Shape.cs" />
+    <Compile Include="Menu\BackMenuOption.cs" />
+    <Compile Include="Menu\BranchMenuOption.cs" />
+    <Compile Include="Menu\IntLeafMenuOption.cs" />
+    <Compile Include="Menu\Menu.cs" />
+    <Compile Include="Menu\MenuOption.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
