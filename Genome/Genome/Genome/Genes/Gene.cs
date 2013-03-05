@@ -130,9 +130,9 @@ namespace Genome
         /// <param name="s">The shape to match across the whole genome</param>
         private void patternMatch(Shape s)
         {
-            for(int row = 0; row < cells.Length - 2; row++)
+            for(int row = 0; row < cells.Length - (s.sizeRow() - 1); row++)
             {
-                for (int col = 0; col < cells.Length - 2; col++)
+                for (int col = 0; col < cells.Length - (s.sizeCol() - 1); col++)
                 {
                     //add some check with Shape size here
                     if (cellMatch(s, row, col))

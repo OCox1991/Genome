@@ -32,7 +32,6 @@ namespace Genome
         IGNORE_FOOD_NON_PREFERRED,
         IGNORE_FOOD,
         IGNORE_CREATURE,
-        IGNORE_BOTH,
 
         //MULTIPLE CREATURES
         FOCUS_WEAKEST, //MIN STR
@@ -43,12 +42,13 @@ namespace Genome
         FOCUS_MOST_HUNGRY, //MIN ENERGY
 
         //MULTIPLE FOOD SOURCES
-        FOCUS_MOST_NOURISHING, //THE FOOD THAT IS BEST FOR THE CREATURE REGARDLESS OF DISTANCE
-        FOCUS_MOST_REMAINING, //FOOD W/ MOST UNITS REMAINING
-        FOCUS_LEAST_DANGEROUS, //FOOD FURTHEST FROM ANY CREATURES VISIBLE, OR CLOSEST TO THE CURRENT CREATURE
-        FOCUS_CLOSEST_PREFERRED, //CLOSEST PREFERRED FOOD
-        FOCUS_LEAST_REMAINING, //FOOD W/ LEAST UNITS REMAINING
-        FOCUS_MOST_EFFICIENT, //BEST FOOD VALUE FOR DISTANCE
+        EAT_MOST_NOURISHING, //THE FOOD THAT IS BEST FOR THE CREATURE REGARDLESS OF DISTANCE
+        EAT_MOST_REMAINING, //FOOD W/ MOST UNITS REMAINING
+        EAT_LEAST_DANGEROUS, //FOOD FURTHEST FROM ANY CREATURES VISIBLE, OR CLOSEST TO THE CURRENT CREATURE
+        EAT_CLOSEST_PREFERRED, //CLOSEST PREFERRED FOOD
+        EAT_LEAST_REMAINING, //FOOD W/ LEAST UNITS REMAINING
+        EAT_MOST_EFFICIENT, //BEST FOOD VALUE FOR DISTANCE
+        EAT_CLOSEST, //CLOSEST, REGARDLESS OF PREFERRED FOOD TYPE
 
         //SINGLE CREATURE
         ATTACK, //IMMEDIATELY CHARGE
@@ -80,7 +80,7 @@ namespace Genome
             {
                 case Scenario.IN_COMBAT: responses = new Response[] { Response.ATTACK, Response.DEFEND, Response.EVADE, Response.ATTACK, Response.DEFEND, Response.EVADE, Response.ATTACK }; 
                     break;
-                case Scenario.IN_COMBAT_CREATURE: responses = new Response[] { Response.ATTACK, Response.EVADE, Response.FOCUS_CLOSEST, Response.FOCUS_LEAST_DANGEROUS, Response.DEFEND, Response.ATTACK, Response.DEFEND };
+                case Scenario.IN_COMBAT_CREATURE: responses = new Response[] { Response.ATTACK, Response.EVADE, Response.FOCUS_CLOSEST, Response.FOCUS_WOUNDED, Response.DEFEND, Response.ATTACK, Response.DEFEND };
                     break;
                 case Scenario.IN_COMBAT_WOUNDED: responses = new Response[] { Response.ATTACK, Response.DEFEND, Response.EVADE, Response.ATTACK, Response.EVADE, Response.EVADE, Response.ATTACK }; 
                     break;
@@ -104,7 +104,7 @@ namespace Genome
                     break;
                 case Scenario.MULT_CREATURE_MULT_FOOD: responses = new Response[] { Response.IGNORE_FOOD, Response.IGNORE_CREATURE, Response.IGNORE_FOOD_NON_PREFERRED, Response.IGNORE_FOOD, Response.IGNORE_FOOD_NON_PREFERRED, Response.IGNORE_CREATURE, Response.IGNORE_CREATURE };
                     break;
-                case Scenario.MULT_FOOD: responses = new Response[] { Response.FOCUS_CLOSEST, Response.FOCUS_CLOSEST_PREFERRED, Response.FOCUS_LEAST_DANGEROUS, Response.FOCUS_MOST_EFFICIENT, Response.FOCUS_MOST_REMAINING, Response.FOCUS_MOST_NOURISHING, Response.FOCUS_CLOSEST_PREFERRED };
+                case Scenario.MULT_FOOD: responses = new Response[] { Response.EAT_CLOSEST, Response.EAT_CLOSEST_PREFERRED, Response.EAT_LEAST_DANGEROUS, Response.EAT_MOST_EFFICIENT, Response.EAT_MOST_REMAINING, Response.EAT_MOST_NOURISHING, Response.EAT_CLOSEST_PREFERRED };
                     break;
                 case Scenario.DEPLETED_PLANT: responses = new Response[] { Response.WAIT, Response.IGNORE, Response.IGNORE, Response.IGNORE, Response.IGNORE, Response.IGNORE, Response.IGNORE };
                     break;

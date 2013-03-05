@@ -10,7 +10,7 @@ namespace Genome
         protected int foodRemaining; //these 3 will be set by each subclass since they need to be different for each
         protected int foodValue;
         protected int actTimer;
-        private int timeTillActing;
+        protected int timeTillActing;
 
         /// <summary>
         /// Sets up the time till acting timer and nothing else.

@@ -43,8 +43,32 @@ namespace Genome
             setUpWorld();
         }
 
+        public void reset()
+        {
+            foreach (Creature c in creatureList)
+            {
+                c.userKillCreature();
+            }
+            foreach (Plant p in plantList)
+            {
+                p.reset();
+            }
+            foreach (Remains r in remainsList)
+            {
+                int[] xy = r.getLocationXY();
+                getTile(xy[1], xy[0]).clearTile();
+            }
+            creatureList = new List<Creature>();
+            deadList = new Stack<Creature>();
+            remainsList = new List<Remains>();
+        }
+
         public void setUpWorld()
         {
+            Vector2 TL = new Vector2(150, 0); //The top left of that area to actually draw the world in
+            inputHandler = new WorldInputHandler(TL, new Vector2(1024 - TL.X, 768 - TL.Y), this);
+            drawer = new WorldDrawer(this);
+
             plantList = new List<Plant>();
             remainsList = new List<Remains>();
             tiles = new Tile[worldX][];
@@ -67,7 +91,32 @@ namespace Genome
         /// </summary>
         private void populateWorld()
         {
-            
+            for (int plantNum = 0; plantNum < Simulation.getPlantPopulation(); plantNum++)
+            {
+                int[] xy = getRandomClearTile();
+                if (xy[0] == -1 && xy[1] == -1)
+                {
+                    throw new Exception("World is full, cannot add any further content");
+                }
+                else
+                {
+                    Tile t = getTile(xy[1], xy[0]);
+                    t.addPlant(new Plant(randomNumberGenerator));
+                }
+            }
+            for (int obstNum = 0; obstNum < Simulation.getNumObstacles(); obstNum++)
+            {
+                int[] xy = getRandomClearTile();
+                if (xy[0] == -1 && xy[1] == -1)
+                {
+                    throw new Exception("World is full, cannot add any further content");
+                }
+                else
+                {
+                    Tile t = getTile(xy[1], xy[0]);
+                    t.addObstacle();
+                }
+            }
         }
 
         /// <summary>
@@ -103,10 +152,7 @@ namespace Genome
             for (int i = 0; i < creatureList.Count; i++)
             {
                 Creature c = creatureList[i];
-                int[] clearTile = getRandomClearTile();
-
-                c.setLocation(clearTile[0], clearTile[1]);
-                getTile(clearTile[1], clearTile[0]).addCreature(c);
+                addCreature(c);
             }
         }
 
@@ -153,6 +199,12 @@ namespace Genome
                             }
                         }
                         yLoc++;
+                    }
+                    if (!found)
+                    {
+                        found = true;
+                        xLoc = -1;
+                        yLoc = -1;
                     }
                 }
             }
@@ -235,7 +287,7 @@ namespace Genome
         /// <param name="row">The row of the tile to look at</param>
         /// <param name="col">The column of the tile to look at</param>
         /// <returns>The tile found at the given row and column</returns>
-        private Tile getTile(int row, int col)
+        public Tile getTile(int row, int col)
         {
             return tiles[col][row];
         }
@@ -249,6 +301,18 @@ namespace Genome
         public void addCreature(int x, int y, Creature c)
         {
             getTile(y, x).addCreature(c);
+        }
+
+        /// <summary>
+        /// Adds a creature at a random clear location
+        /// </summary>
+        /// <param name="c"></param>
+        public void addCreature(Creature c)
+        {
+            int[] clearTile = getRandomClearTile();
+
+            c.setLocation(clearTile[0], clearTile[1]);
+            getTile(clearTile[1], clearTile[0]).addCreature(c);
         }
 
         /// <summary>
@@ -347,6 +411,26 @@ namespace Genome
             return getTile(y, x).getCreature();
         }
 
+        public bool plantAt(int x, int y)
+        {
+            return getTile(y, x).plantPresent();
+        }
+
+        public Plant getPlantAt(int x, int y)
+        {
+            return getTile(y, x).getPlant();
+        }
+
+        public bool remainsAt(int x, int y)
+        {
+            return getTile(y, x).remainsPresent();
+        }
+
+        public Remains getRemainsAt(int x, int y)
+        {
+            return getTile(y, x).getRemains();
+        }
+
         /// <summary>
         /// Clears a specified tile, removing all of its contents
         /// </summary>
@@ -357,6 +441,15 @@ namespace Genome
             getTile(y, x).clearTile();
         }
 
+        /// <summary>
+        /// Gets the no. of tiles in the World as a Vector 2
+        /// </summary>
+        /// <returns>A vector2 representing the number of tiles in the world in X and Y</returns>
+        public Vector2 getSize()
+        {
+            return new Vector2(worldX, worldY);
+        }
+        
         /// <summary>
         /// A method to sort the creatures by their speed
         /// </summary>
@@ -396,7 +489,7 @@ namespace Genome
 
         public override void update(GameTime gameTime)
         {
-            for (int i = 0; i < Simulation.getSpeed(); i++)
+            for (int i = 0; i < inputHandler.getSpeed(); i++)
             {
                 tick(); //tick x times based on the speed specified by the simulation
             }

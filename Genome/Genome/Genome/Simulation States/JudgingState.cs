@@ -12,6 +12,8 @@ namespace Genome
     /// </summary>
     class JudgingState : SimulationState
     {
+        private JudgeDrawer drawer;
+
         private bool isJudged;
         private bool isEliminated;
         private bool isBred;
@@ -19,7 +21,7 @@ namespace Genome
         private string status;
 
         private List<Creature> aliveCreatures;
-        private Stack deadCreatures;
+        private Stack<Creature> deadCreatures;
         private List<Creature> creatureList;
         private List<Creature> top;
         private List<Creature> bottom;
@@ -28,7 +30,7 @@ namespace Genome
         private int upperFix;
         private int total;
 
-        public JudgingState(List<Creature> aliveCreatures, Stack deadCreatures)
+        public JudgingState(List<Creature> aliveCreatures, Stack<Creature> deadCreatures)
         {
             this.aliveCreatures = aliveCreatures;
             this.deadCreatures = deadCreatures;
@@ -55,7 +57,7 @@ namespace Genome
                 //enclose this in an IF statement if you want to prevent dead creatures from being included
                 while(deadCreatures.Count > 0)
                 {
-                    Creature c = (Creature)deadCreatures.Pop();
+                    Creature c = deadCreatures.Pop();
                     creatureList.Add(c);
                 }
                 //upon loop exit creatureList should be a list of creatures sorted by success in the world
@@ -89,7 +91,7 @@ namespace Genome
                 else
                 {
                     Random rand = new Random();
-                    if (creatureList.Count < (Simulation.getPopulation() / 100) * Simulation.getHighRatio())
+                    if (creatureList.Count < (Simulation.getPopulation() / 100) * Simulation.getTopPercentage())
                     {
                         int c1 = rand.Next(top.Count);
                         int c2 = rand.Next(top.Count);
@@ -182,7 +184,7 @@ namespace Genome
 
         public override void draw()
         {
-
+            drawer.draw();
         }
     }
 }

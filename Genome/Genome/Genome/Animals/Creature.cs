@@ -181,6 +181,22 @@ namespace Genome
         {
             return speed;
         }
+
+        public int getAwareness()
+        {
+            return awareness;
+        }
+
+        public int getEnergy()
+        {
+            return energy;
+        }
+
+        public int getStatValue()
+        {
+            return speed + awareness + defence + maxHealth + initEnergy + stealthVal + strength;
+        }
+
         #endregion
 
         public void tick()
@@ -213,32 +229,31 @@ namespace Genome
             List<Plant> pl = (List<Plant>)l[1];
             List<Remains> rl = (List<Remains>)l[2];
             List<Obstacle> ol = (List<Obstacle>)l[3];
+            List<FoodSource> fl = new List<FoodSource>();
+            fl.AddRange(pl.ToArray<FoodSource>());
+            fl.AddRange(rl.ToArray<FoodSource>());
+            #region dealing with stealth
+            foreach (Creature c in cl)
+            {
+                if (c.isStealthy() && !canSee(c))
+                {
+                    cl.Remove(c);
+                }
+                else
+                {
+                    c.spotted();
+                }
+            }
             #endregion
-            #region 4. Do Something
+
+            #endregion
+            #region 4. Decide what scenario applies
             Scenario s = Scenario.NOTHING;
 
             int creatureCount = cl.Count;
             int plantCount = pl.Count;
             int remainsCount = rl.Count;
             int foodCount = plantCount + remainsCount;
-            WorldObject trackingObject = null;
-            List<WorldObject> trackingObjects = null;
-            Response resp = Response.RANDOM;
-
-            foreach (Creature c in cl)
-            {
-                if (c.isStealthy())
-                {
-                    if (!canSee(c))
-                    {
-                        cl.Remove(c);
-                    }
-                    else
-                    {
-                        c.spotted();
-                    }
-                }
-            }
 
             if(inCombat)
             {
@@ -276,7 +291,6 @@ namespace Genome
                 {
                     s = Scenario.CREATURE;
                 }
-                resp = behaviour[s];
                 #endregion
             }
             else if (creatureCount > 1)
@@ -303,46 +317,16 @@ namespace Genome
             else if (foodCount == 1) //1 food visible
             {
                 #region single food
-                //set up tracking object
-                if (pl.Count == 0) //if not plant
-                {
-                    trackingObject = rl[0];
-                }
-                else //if plant
-                {
-                    trackingObject = pl[0];
-                }
                 
                 if (energy < Simulation.getStarvingEnergyLevel()) //check if the scenario is for starving or not starving
                 {
                     s = Scenario.STARVING_FOOD; //set scenario
-                    resp = behaviour[s];
-
-                    if (resp == Response.EAT_PREFERRED) //deal with conditional responses
-                    {
-                        eatPreferred((FoodSource)trackingObject);
-                    }
-                    else
-                    {
-                        eat((FoodSource)trackingObject);
-                    }
                 }
                 else //if not starving
                 {
                     s = Scenario.FOOD;
-                    resp = behaviour[s];
-
-                    if (resp == Response.EAT_PREFERRED) //deal with conditional responses
-                    {
-                        eatPreferred((FoodSource)trackingObject);
-                    }
-                    else
-                    {
-                        eat((FoodSource)trackingObject);
-                    }
                 }
                 #endregion
-                //DONE
             }
             else if (foodCount > 0)
             {
@@ -355,7 +339,75 @@ namespace Genome
                 s = Scenario.NOTHING;
             }
             #endregion
+            #region 5. Decide on response and take action
+            Response resp = behaviour[s];
+            switch (resp)
+            {
+                    //creatures + food
+                case Response.IGNORE_FOOD_NON_PREFERRED: ignoreNonPrefFood(pl, rl, cl); break;
+                case Response.IGNORE_FOOD: ignoreFood(cl); break;
+                case Response.IGNORE_CREATURE: ignoreCreature(pl, rl); break;
+                    //multiple creatures
+                case Response.FOCUS_WEAKEST: creatureAct(getWeakest(cl)); break;
+                case Response.FOCUS_SLOWEST: creatureAct(getSlowest(cl)); break;
+                case Response.FOCUS_WOUNDED: creatureAct(getWounded(cl)); break;
+                case Response.FOCUS_LEAST_DEFENDED: creatureAct(getLeastDefended(cl)); break;
+                case Response.FOCUS_CLOSEST: creatureAct((Creature)getClosest(cl.ToList<WorldObject>())); break;
+                case Response.FOCUS_MOST_HUNGRY: creatureAct(getMostHungry(cl)); break;
+                    //single food
+                case Response.EAT:
+                    if (plantCount > 0)
+                    {
+                        eat(pl[0]);
+                    }
+                    else
+                    {
+                        eat(rl[0]);
+                    }
+                    break;
+                case Response.EAT_PREFERRED:
+                    if (plantCount > 0)
+                    {
+                        eatPreferred(pl[0]);
+                    }
+                    else
+                    {
+                        eatPreferred(rl[0]);
+                    }
+                    break;
+                    //multiple food
+                case Response.EAT_MOST_NOURISHING: eat(getMostNourishing(fl)); break;
+                case Response.EAT_MOST_REMAINING: eat(getMostRemaining(fl)); break;
+                case Response.EAT_LEAST_DANGEROUS: eat(getLeastDangerous(fl, cl)); break;
+                case Response.EAT_CLOSEST_PREFERRED: eat(getClosestPreferred(fl)); break;
+                case Response.EAT_LEAST_REMAINING: eat(getLeastRemaining(fl)); break;
+                case Response.EAT_MOST_EFFICIENT: eat(getMostEfficient(fl)); break;
+                case Response.EAT_CLOSEST: eat((FoodSource)getClosest(fl.ToList<WorldObject>())); break;
+                    //single creature
+                case Response.ATTACK: 
+                    if(inCombat)
+                    {
+                        attack(inCombatWith);
+                    }
+                    else
+                    {
+                        attack(cl[0]);   
+                    }
+                    break;
+                case Response.IGNORE: randomAction(); break;
+                case Response.HIDE: hide(); break;
+                case Response.AMBUSH: ambush(cl[0]); break;
+                case Response.DEFEND: break; //NOT DONE
+                case Response.EVADE: evade(cl.ToList<WorldObject>()); break;
+                case Response.STALK: stalk(cl[0]); break;
+                    //no scenario
+                case Response.RANDOM: randomAction(); break;
+            }
+            #endregion
         }
+
+        
+        
 
         /// <summary>
         /// A method used to check if you can detect a creature that is trying to be stealthy
@@ -366,7 +418,12 @@ namespace Genome
         {
             Random r = new Random();
             bool b = true;
-            if(r.Next(100) < c.getStealthVal() + (getEuclideanDistanceFrom(c) - awareness))
+            double i = getEuclideanDistanceFrom(c);
+            if (i > awareness)
+            {
+                b = false;
+            }
+            else if(r.Next(100) < c.getStealthVal() + (i - awareness))
             {
                 b = false;
             }
@@ -539,7 +596,7 @@ namespace Genome
             FoodSource retFood = null;
             foreach (FoodSource f in food)
             {
-                int danger = getDanger(f, creatures);
+                int danger = getDanger(f, creatures.ToList<WorldObject>());
                 if (danger < leastDanger)
                 {
                     leastDanger = danger;
@@ -549,12 +606,12 @@ namespace Genome
             return retFood;
         }
 
-        private int getDanger(FoodSource f, List<Creature> creatures)
+        private int getDanger(WorldObject o, List<WorldObject> things)
         {
             int danger = 0;
-            foreach (Creature c in creatures)
+            foreach (WorldObject b in things)
             {
-                danger += f.getDistanceFrom(c);
+                danger += o.getDistanceFrom(b);
             }
             return danger;
         }
@@ -616,7 +673,58 @@ namespace Genome
 
         #endregion
 
+        #region stat manipulating methods
+
+        public void damage(int damage)
+        {
+            //don't reduce based on defence here, since this method is used for when the creature runs out of energy as well
+            health -= damage;
+            if (health <= 0)
+            {
+                this.die();
+            }
+        }
+
+        public void die()
+        {
+            world.killCreature(this);
+        }
+
+        public bool canAct(int energyCost)
+        {
+            return energyCost <= stamina;
+        }
+
+        public void drainEnergy(int energyAmt)
+        {
+            if (energy <= energyAmt)
+            {
+                energy -= energyAmt;
+            }
+            else
+            {
+                energyAmt -= energy;
+                energy = 0;
+                damage(energyAmt);
+            }
+            if (stamina > energyAmt)
+            {
+                stamina -= energyAmt;
+            }
+            else
+            {
+                stamina = 0;
+            }
+        }
+
+        #endregion
+
         #region action methods
+        /// <summary>
+        /// Checks if a piece of food is of the type the creature prefers
+        /// </summary>
+        /// <param name="f">The piece of food to check</param>
+        /// <returns>If the piece of food is of the type the creature prefer</returns>
         private bool foodIsPreferred(FoodSource f)
         {
             bool b = false;
@@ -635,24 +743,43 @@ namespace Genome
             return b;
         }
 
+        /// <summary>
+        /// Tells the creature it is being attacked and updates the variables related to that
+        /// </summary>
+        /// <param name="c"></param>
         public void attacked(Creature c)
         {
             inCombat = true;
             inCombatWith = c;
         }
 
+        /// <summary>
+        /// Updates the flags to tell the creature it is not in combat
+        /// </summary>
         public void outOfCombat()
         {
             inCombat = false;
             inCombatWith = null;
         }
 
+        /// <summary>
+        /// Eats a piece of food and adjusts stamina, energy and the food itself as needed
+        /// </summary>
+        /// <param name="f">The foodsource to eat from</param>
         public void eat(FoodSource f)
         {
             if (isAdjacent(f))
             {
-                f.beEaten();
-                energy += getNourishmentAmt(f);
+                if (stamina == maxStamina)
+                {
+                    f.beEaten();
+                    energy += getNourishmentAmt(f);
+                    stamina /= (100/50); //could be set by Simulation 
+                }
+                else
+                {
+                    //wait for stamina to increase
+                }
             }
             else
             {
@@ -660,38 +787,52 @@ namespace Genome
             }
         }
 
-        public void damage(int damage)
+        /// <summary>
+        /// Eats a piece of food only if it is of the type the creature prefers
+        /// </summary>
+        /// <param name="f"></param>
+        private void eatPreferred(FoodSource f)
         {
-            //some reduction based on defence
-            health -= damage;
-            if (health <= 0)
-            {
-                this.die();
-            }
-        }
-
-        public void die()
-        {
-            world.killCreature(this);
-        }
-
-        private bool eatPreferred(FoodSource f)
-        {
-            bool b = foodIsPreferred(f);
-            if (b)
+            if (foodIsPreferred(f))
             {
                 eat(f);
             }
-            return b;
         }
 
+        /// <summary>
+        /// Attacks another creature, comparing strength to defence and moving towards the other creature if it is not adjacent
+        /// </summary>
+        /// <param name="otherCreature">The creature to attack</param>
         public void attack(Creature otherCreature)
         {
             if (isAdjacent(otherCreature))
             {
+                int winnerEnergy = 10;
+                int loserEnergy = 20;
+
                 otherCreature.attacked(this);
                 inCombat = true;
                 inCombatWith = otherCreature;
+                int attackVal = this.getStrength() + rand(10);
+                int defVal = otherCreature.getDefence() + rand(10);
+
+                if (attackVal > defVal)
+                {
+                    otherCreature.damage(attackVal - defVal);
+                    this.drainEnergy(winnerEnergy);
+                    otherCreature.drainEnergy(loserEnergy);
+                }
+                else if (attackVal < defVal)
+                {
+                    this.damage((defVal - attackVal) / 2);
+                    this.drainEnergy(loserEnergy);
+                    otherCreature.drainEnergy(winnerEnergy);
+                }
+                else
+                {
+                    this.drainEnergy(loserEnergy);
+                    otherCreature.drainEnergy(loserEnergy);
+                }
             }
             else
             {
@@ -699,43 +840,92 @@ namespace Genome
             }
         }
 
+        /// <summary>
+        /// Generates an 'exploding' random number with x as the high value for each roll
+        /// </summary>
+        /// <param name="x">The max value of each random roll and the value that must be gotten to reroll</param>
+        /// <returns>A value which consists of a number of randomly generated numbers where each x triggers another number to be generated and added to the total</returns>
+        private int rand(int x)
+        {
+            Random r = new Random();
+            int returnVal = 0;
+            int randVal;
+            do
+            {
+                randVal = r.Next(x) + 1;
+                returnVal += randVal;
+            }
+            while (randVal == x);
+            return returnVal;
+        }
+
+        /// <summary>
+        /// If a creature hides it is considered stealthy until it is spotted
+        /// </summary>
         public void hide()
         {
             stealth = true;
         }
 
+        /// <summary>
+        /// If a creature is spotted it is no longer considered hidden from any other creature
+        /// </summary>
         public void spotted()
         {
             stealth = false;
         }
 
-        public void move(Direction dir)
+        /// <summary>
+        /// Controls ambush behaviour, where a creature tries to sneak up next to another to get a high damage special attack
+        /// </summary>
+        /// <param name="c"></param>
+        public void ambush(Creature c)
         {
-            int[] newLoc = null;
-            //add combat checking
-            switch (dir)
+            if (isStealthy())
             {
-                case Direction.SOUTH: newLoc = new int[]{getLocationXY()[0], getLocationXY()[1] + 1}; 
-                    break;
-                case Direction.SOUTHEAST: newLoc = new int[]{getLocationXY()[0] + 1, getLocationXY()[1] + 1};
-                    break;
-                case Direction.EAST: newLoc = new int[]{getLocationXY()[0] + 1, getLocationXY()[1]};
-                    break;
-                case Direction.NORTHEAST: newLoc = new int[]{getLocationXY()[0] + 1, getLocationXY()[1] - 1};
-                    break;
-                case Direction.NORTH: newLoc = new int[]{getLocationXY()[0], getLocationXY()[1] -1};
-                    break;
-                case Direction.NORTHWEST: newLoc = new int[]{getLocationXY()[0] - 1, getLocationXY()[1] - 1};
-                    break;
-                case Direction.WEST: newLoc = new int[]{getLocationXY()[0], getLocationXY()[1] - 1};
-                    break;
-                case Direction.SOUTHWEST: newLoc = new int[]{getLocationXY()[0] - 1, getLocationXY()[1] + 1};
-                    break;
+                if (!c.canSee(this))
+                {
+                    if (isAdjacent(c))
+                    {
+                        c.damage((getStrength() / 2) + getStealthVal());
+                        spotted();
+                    }
+                    else
+                    {
+                        moveTowards(c);
+                    }
+                }
+                else
+                {
+                    spotted();
+                }
             }
+            else
+            {
+                hide();
+            }
+        }
+
+        /// <summary>
+        /// Moves the creature in a given direction if that is possible and drains energy as needed
+        /// </summary>
+        /// <param name="dir">The direction to move in</param>
+        private void move(Direction dir)
+        {
+            int energyCost = 40;
+            if (isStealthy())
+            {
+                energyCost *= 2;
+            }
+            int[] newLoc = getLocationFromDirection(dir);
             if (world.tileIsClear(newLoc[1], newLoc[0]))
             {
-                world.clearTile(getLocationXY()[1], getLocationXY()[0]);
-                world.addCreature(getLocationXY()[0], getLocationXY()[1], this);
+                if(canAct(energyCost)) //if it can afford the energy cost
+                {
+                    world.clearTile(getLocationXY()[1], getLocationXY()[0]); //clear old tile
+                    world.addCreature(getLocationXY()[0], getLocationXY()[1], this); //add to new tile
+                    this.drainEnergy(energyCost); //drain energy 
+                }
             }
             else if (world.creatureAt(getLocationXY()[1], getLocationXY()[0]))
             {
@@ -743,16 +933,252 @@ namespace Genome
             }
         }
 
-        public void moveTowards(WorldObject thing) //TODO: Add speed stuff for no. of moves
+        /// <summary>
+        /// Moves towards a given world object
+        /// </summary>
+        /// <param name="thing">The thing to move towards</param>
+        public void moveTowards(WorldObject thing)
         {
+            if (inCombat)
+            {
+                if (getSpeed() + rand(10) < inCombatWith.getSpeed() + rand(10))
+                {
+                    damage(inCombatWith.getStrength() - getDefence());
+                }
+                outOfCombat();
+            }
             Direction d = getDirectionTo(thing);
             move(d);
         }
 
+        /// <summary>
+        /// Moves away from a given world object
+        /// </summary>
+        /// <param name="thing">The world object to avoid</param>
+        public void moveAwayFrom(WorldObject thing)
+        {
+            if (inCombat)
+            {
+                if (getSpeed() + rand(10) < inCombatWith.getSpeed() + rand(10))
+                {
+                    damage(inCombatWith.getStrength() - getDefence());
+                }
+                outOfCombat();
+            }
+            Direction d = getDirectionTo(thing);
+            move(d.opposite());
+        }
+
         public void evade(List<WorldObject> things)
         {
-
+            int[] realLoc = getLocationXY();
+            Direction[] d = new Direction[] { Direction.NORTH, Direction.NORTHEAST, Direction.NORTHWEST, Direction.SOUTH, Direction.SOUTHEAST, Direction.SOUTHWEST, Direction.WEST, Direction.EAST };
+            int bestSoFar = int.MaxValue;
+            Direction bestDirSoFar = Direction.NORTH;
+            foreach (Direction dir in d)
+            {
+                int[] newLoc = getLocationFromDirection(dir);
+                if (world.tileIsClear(newLoc[1], newLoc[0]))
+                {
+                    this.setLocation(newLoc[0], newLoc[1]);
+                    int danger = getDanger(this, things);
+                    if (danger < bestSoFar)
+                    {
+                        bestSoFar = danger;
+                        bestDirSoFar = dir;
+                    }
+                }
+            }
+            setLocation(realLoc[0], realLoc[1]);
+            move(bestDirSoFar);
         }
+        
+        private void randomAction()
+        {
+            Direction dir = Direction.NORTH;
+            dir = dir.randomDirection();
+            move(dir);
+        }
+
+        private void creatureAct(Creature c)
+        {
+            switch (behaviour[Scenario.CREATURE])
+            {
+                case Response.ATTACK: attack(c); break;
+                case Response.EVADE: moveAwayFrom(c); break;
+                case Response.IGNORE: randomAction(); break;
+                case Response.HIDE: hide(); break;
+                case Response.DEFEND: break;
+                case Response.STALK: stalk(c); break;
+                case Response.AMBUSH: ambush(c); break;
+            }
+        }
+
+        /// <summary>
+        /// Routes to the correct method call if the creature decides it needs to ignore any food in sight
+        /// </summary>
+        /// <param name="cl">The list of creatures gotten from scanning the surroundings</param>
+        private void ignoreFood(List<Creature> cl)
+        {
+            if (cl.Count > 1)
+            {
+                switch (behaviour[Scenario.MULT_CREATURE])
+                {
+                    case Response.FOCUS_WEAKEST: creatureAct(getWeakest(cl)); break;
+                    case Response.FOCUS_SLOWEST: creatureAct(getSlowest(cl)); break;
+                    case Response.FOCUS_WOUNDED: creatureAct(getWounded(cl)); break;
+                    case Response.FOCUS_LEAST_DEFENDED: creatureAct(getLeastDefended(cl)); break;
+                    case Response.FOCUS_CLOSEST: creatureAct((Creature)getClosest(cl.ToList<WorldObject>())); break;
+                    case Response.FOCUS_MOST_HUNGRY: creatureAct(getMostHungry(cl)); break;
+                }
+            }
+            else
+            {
+                creatureAct(cl[0]);
+            }
+        }
+
+        private int[] getLocationFromDirection(Direction d)
+        {
+            int[] newLoc = null;
+            switch (d)
+            {
+                case Direction.SOUTH: newLoc = new int[] { getLocationXY()[0], getLocationXY()[1] + 1 };
+                    break;
+                case Direction.SOUTHEAST: newLoc = new int[] { getLocationXY()[0] + 1, getLocationXY()[1] + 1 };
+                    break;
+                case Direction.EAST: newLoc = new int[] { getLocationXY()[0] + 1, getLocationXY()[1] };
+                    break;
+                case Direction.NORTHEAST: newLoc = new int[] { getLocationXY()[0] + 1, getLocationXY()[1] - 1 };
+                    break;
+                case Direction.NORTH: newLoc = new int[] { getLocationXY()[0], getLocationXY()[1] - 1 };
+                    break;
+                case Direction.NORTHWEST: newLoc = new int[] { getLocationXY()[0] - 1, getLocationXY()[1] - 1 };
+                    break;
+                case Direction.WEST: newLoc = new int[] { getLocationXY()[0], getLocationXY()[1] - 1 };
+                    break;
+                case Direction.SOUTHWEST: newLoc = new int[] { getLocationXY()[0] - 1, getLocationXY()[1] + 1 };
+                    break;
+            }
+            return newLoc;
+        }
+
+        /// <summary>
+        /// Stalks another creature, trying to stay outside of its view radius, with the ideal position being just outside the view radius
+        /// </summary>
+        /// <param name="creature">The creature to stalk</param>
+        private void stalk(Creature creature)
+        {
+            if (creature.getAwareness() < this.awareness)
+            {
+                if (getDistanceFrom(creature) > creature.getAwareness() + 1)
+                {
+                    moveTowards(creature);
+                }
+                else if (getDistanceFrom(creature) == creature.getAwareness() + 1)
+                {
+                    //stay still
+                }
+                else
+                {
+                    moveAwayFrom(creature);
+                }
+            }
+            else
+            {
+                ambush(creature);
+            }
+        }
+
+        private void ignoreCreature(List<Plant> pl, List<Remains> rl)
+        {
+            Scenario s = Scenario.MULT_FOOD;
+            if (energy < Simulation.getStarvingEnergyLevel())
+            {
+                s = Scenario.STARVING_FOOD;
+            }
+            else if (pl.Count + rl.Count > 1)
+            {
+                s = Scenario.MULT_FOOD;
+            }
+            else
+            {
+                s = Scenario.FOOD;
+            }
+            List<FoodSource> fl = pl.ToList<FoodSource>();
+            fl.AddRange(rl.ToList<FoodSource>());
+
+            switch (behaviour[s])
+            {
+                case Response.EAT: eat((FoodSource)getClosest(fl.ToList<WorldObject>())); break;
+                case Response.EAT_PREFERRED: eatPreferred((FoodSource)getClosest(fl.ToList<WorldObject>())); break;
+                case Response.EAT_CLOSEST: eat((FoodSource)getClosest(fl.ToList<WorldObject>())); break;
+                case Response.EAT_CLOSEST_PREFERRED: eat(getClosestPreferred(fl)); break;
+                case Response.EAT_LEAST_DANGEROUS: eat(getLeastDangerous(fl, new List<Creature>())); break;
+                case Response.EAT_LEAST_REMAINING: eat(getLeastRemaining(fl)); break;
+                case Response.EAT_MOST_EFFICIENT: eat(getMostEfficient(fl)); break;
+                case Response.EAT_MOST_NOURISHING: eat(getMostNourishing(fl)); break;
+                case Response.EAT_MOST_REMAINING: eat(getMostRemaining(fl)); break;
+            }
+        }
+
+        /// <summary>
+        /// Routing method for handling ignoring non preferred food, if no preferred food exists, treats it as an ignore food response, if preferred food exists treats it as an
+        /// ignore creature response without the ignored food being passed on for consideration
+        /// </summary>
+        /// <param name="pl">The list of visible plants</param>
+        /// <param name="rl">The list of visible remains</param>
+        /// <param name="cl">The list of visible creatures</param>
+        private void ignoreNonPrefFood(List<Plant> pl, List<Remains> rl, List<Creature> cl)
+        {
+            if (diet <= 0.5M)
+            {
+                if (pl.Count == 0)
+                {
+                    ignoreFood(cl);
+                }
+                else if (pl.Count == 1)
+                {
+                    eat(pl[0]);
+                }
+                else
+                {
+                    ignoreCreature(pl, new List<Remains>());
+                }
+            }
+            else if (diet > 0.5M)
+            {
+                if (rl.Count == 0)
+                {
+                    ignoreFood(cl);
+                }
+                else if (rl.Count == 1)
+                {
+                    eat(rl[0]);
+                }
+                else
+                {
+                    ignoreCreature(new List<Plant>(), rl);
+                }
+            }
+        }
+
+        #region user manual controls
+
+        public Creature userCloneCreature()
+        {
+            Creature c = new Creature(this.getDna());
+            world.addCreature(c);
+            return c;
+        }
+
+        public void userKillCreature()
+        {
+            this.die();
+        }
+
+        #endregion
+
         #endregion
         #endregion
 

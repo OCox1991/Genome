@@ -7,8 +7,7 @@ namespace Genome
 {
     class BackMenuOption : MenuOption
     {
-        public BackMenuOption(Menu menu)
-            : base(menu, "Back")
+        public BackMenuOption(Menu menu) : base(menu, "Back")
         {
 
         }

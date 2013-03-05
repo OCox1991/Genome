@@ -1,0 +1,6 @@
+Content\BlankTile.xnb
+Content\Creature.xnb
+Content\GameThumbnail.xnb
+Content\Obstacle.xnb
+Content\Plant.xnb
+Content\Remains.xnb

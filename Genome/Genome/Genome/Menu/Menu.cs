@@ -5,19 +5,15 @@ using System.Text;
 
 namespace Genome
 {
-    abstract class Menu
+    abstract class Menu : SimulationState
     {
         protected string title;
         protected string description;
         protected List<MenuOption> options;
 
-        protected List<MenuOption> prevOptions;
-        protected string prevTitle;
-        protected string prevDescription;
-
-        protected List<MenuOption> topOptions; //need to write init and access for these
-        protected string topTitle;
-        protected string topDescription;
+        protected Stack<List<MenuOption>> prevOptions;
+        protected Stack<string> prevTitle;
+        protected Stack<string> prevDescription;
 
         #region public accessor
         public string Title
@@ -25,14 +21,24 @@ namespace Genome
             get { return title; }
             set
             {
-                prevTitle = title;
+                prevTitle.Push(title);
                 title = value; 
             }
         }
 
         public string PrevTitle
         {
-            get { return prevTitle; }
+            get
+            {
+                if (prevTitle.Count == 0)
+                {
+                    return title;
+                }
+                else
+                {
+                    return prevTitle.Pop();
+                }
+            }
         }
 
         public string Description
@@ -40,14 +46,24 @@ namespace Genome
             get { return description; }
             set
             {
-                prevDescription = description;
+                prevDescription.Push(description);
                 description = value; 
             }
         }
 
         public string PrevDescription
         {
-            get { return prevDescription; }
+            get
+            {
+                if (prevDescription.Count == 0)
+                {
+                    return description;
+                }
+                else
+                {
+                    return prevDescription.Pop();
+                }
+            }
         }
 
         public List<MenuOption> Options
@@ -55,14 +71,24 @@ namespace Genome
             get { return options; }
             set
             {
-                prevOptions = options;
+                prevOptions.Push(options);
                 options = value; 
             }
         }
 
         public List<MenuOption> PrevOptions
         {
-            get { return prevOptions; }
+            get
+            {
+                if (prevOptions.Count == 0)
+                {
+                    return options;
+                }
+                else
+                {
+                    return prevOptions.Pop();
+                }
+            }
         }
 
         private int optionSelected;
@@ -85,5 +111,14 @@ namespace Genome
                 m.deselect();
             }
         }
+
+        public void addOption(MenuOption o)
+        {
+            options.Add(o);
+        }
+
+        public abstract override void update(Microsoft.Xna.Framework.GameTime gameTime);
+
+        public abstract override void draw();
     }
 }

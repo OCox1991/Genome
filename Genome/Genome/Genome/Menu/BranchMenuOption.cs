@@ -16,6 +16,17 @@ namespace Genome
             this.options = options;
         }
 
+        public BranchMenuOption(Menu menu, string text, string description) : base(menu, text)
+        {
+            this.description = description;
+            this.options = new List<MenuOption>();
+        }
+
+        protected void addOption(MenuOption o)
+        {
+            options.Add(o);
+        }
+
         protected override void selected()
         {
             menu.Title = text;

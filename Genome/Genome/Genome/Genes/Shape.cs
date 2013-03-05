@@ -50,6 +50,17 @@ namespace Genome
         {
             return cells[row][col].getDomColour();
         }
+
+        public int sizeRow()
+        {
+            return cells.Length;
+        }
+
+        public int sizeCol()
+        {
+            return cells[0].Length;
+        }
+
         #endregion
     }
 }

@@ -11,14 +11,14 @@ namespace Genome
         public Plant(Random r)
         {
             foodValue = Simulation.getPlantFoodValue();
-            if (!Simulation.getPlantFoodValueVariation() == 0)
+            if (!(Simulation.getPlantFoodValueVariation() == 0))
             {
-                int flip = r.Next(2);
+                int flip = r.Next(3); //either add, subtract or leave the food value the same
                 if (flip == 1)
                 {
                     foodValue += foodValue * (1 / Simulation.getPlantFoodValueVariation());
                 }
-                else
+                else if (flip == 2)
                 {
                     foodValue -= foodValue * (1 / Simulation.getPlantFoodValueVariation());
                 }
@@ -39,6 +39,13 @@ namespace Genome
         public bool isDepeleted()
         {
             return foodRemaining == 0;
+        }
+
+        public void reset()
+        {
+            foodRemaining = foodMax;
+            actTimer = Simulation.getNumTicksToRegrowPlant();
+            timeTillActing = 0;
         }
     }
 }
