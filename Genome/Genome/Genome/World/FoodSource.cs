@@ -62,7 +62,7 @@ namespace Genome
         /// </summary>
         public void tick()
         {
-            if (timeTillActing == actTimer)
+            if (timeTillActing >= actTimer)
             {
                 act();
                 timeTillActing = 0;
@@ -71,6 +71,11 @@ namespace Genome
             {
                 timeTillActing++;
             }
+        }
+
+        public bool canBeEaten()
+        {
+            return foodRemaining > 0;
         }
 
         /// <summary>

@@ -14,8 +14,6 @@ namespace Genome
 {
     abstract class SimulationState
     {
-        protected Simulation simulation;
-
         public abstract void update(GameTime gameTime);
 
         public abstract void draw();

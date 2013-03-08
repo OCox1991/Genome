@@ -12,24 +12,40 @@ namespace Genome
         private List<ParamToken> posMods;
         private List<ParamToken> negMods;
         private int[] colourCount;
+        private const int cellsX = 10;
+        private const int cellsY = 10;
+
 
         /// <summary>
         /// The empty constructor for the gene, which produces a random array of cells.
         /// </summary>
         public Gene()
         {
-            cells = new Cell[10][]; //Using jagged arrays here to improve extensibility
-            Random r = new Random();
-            for(int i = 1; i < cells.Length; i++)
+            Random rand = WorldState.RandomNumberGenerator;
+            cells = new Cell[cellsX][]; //Using jagged arrays here to improve extensibility
+            for(int i = 0; i < cells.Length; i++)
             {
-                cells[i] = new Cell[10];
-                for(int j = 1; j < cells[i].Length; j++)
+                cells[i] = new Cell[cellsY];
+                for(int j = 0; j < cells[i].Length; j++)
                 {
-                    int c = r.Next(7);
+                    int c = rand.Next(7);
                     cells[i][j] = new Cell(c, c);
                 }
             }
             this.init();
+            #if DEBUG
+                Console.WriteLine();
+                Console.WriteLine();
+                foreach (string s in toStrings())
+                {
+                    Console.WriteLine(s);
+                }
+
+                for (int i = 0; i < colourCount.Length; i++)
+                {
+                    Console.WriteLine(String.Concat(new String[] { "Number of ", i.ToString(), "s: ", colourCount[i].ToString() }));
+                }
+            #endif
         }
 
         /// <summary>
@@ -48,7 +64,8 @@ namespace Genome
         private void init()
         {
             recognisedShapes = Simulation.getShapes();
-
+            posMods = new List<ParamToken>();
+            negMods = new List<ParamToken>();
             foreach(Shape s in recognisedShapes)
             {
                 patternMatch(s);
@@ -194,10 +211,10 @@ namespace Genome
             }
             else
             {
-                int[] results = new int[8];
-                for (int i = 0; i < 3; i++) //this loop produces an array where the number of each colour is mapped to the number of times it occurs
+                int[] results = new int[7];
+                for (int i = 0; i < 2; i++) //this loop produces an array where the number of each colour is mapped to the number of times it occurs
                 {
-                    for (int j = 0; j < 3; j++)
+                    for (int j = 0; j < 2; j++) //look at 0, 1, 2 (-1, 0, 1)
                     {
                         int lookupRow = row + (i-1);
                         int lookupCol = col + (j-1);
@@ -206,13 +223,13 @@ namespace Genome
                 }
                 
                 int maxVal = 0; //the maximum value found so far
-                Boolean[] tieColours = new Boolean[8]; //used to keep track of what colours are part of the tie
+                Boolean[] tieColours = new Boolean[7]; //used to keep track of what colours are part of the tie
                 Boolean tie = true; //used to keep track of if a tie is occuring
-                for (int i = 0; i < results.Length; i++)
+                for (int i = 0; i < results.Length; i++)//finding the max occurences in the results ie. max(results)
                 {
-                    if (results[i] > maxVal) //if a better max has been found
+                    if (results[i] > maxVal || maxColour == -1) //if a better max has been found OR no max colour currently exists
                     {
-                        if (tie) //will break any ties that exist
+                        if (tie) //if something is > maxVal then any existing tie has been broken
                         {
                             for (int iter = 1; iter < tieColours.Length; iter++ )
                             {
@@ -263,7 +280,7 @@ namespace Genome
         /// </summary>
         public void countColours()
         {
-            colourCount = new int[8]; //meaning it contains the numbers 1 to 7;
+            colourCount = new int[7]; //meaning it contains the numbers 0 to 6;
             for (int r = 0; r < cells.Length; r++)
             {
                 for (int c = 0; c < cells[r].Length; c++)
@@ -281,6 +298,20 @@ namespace Genome
         public int getSizeY()
         {
             return cells[0].Length;
+        }
+
+        public String[] toStrings()
+        {
+            String[] s = new String[cells[0].Length];
+            for (int i = 0; i < cells.Length; i++)
+            {
+                s[i] = "";
+                for (int j = 0; j < cells[i].Length; j++)
+                {
+                    s[i] = String.Concat(new String[]{s[i], cells[i][j].getDomColour().ToString()});
+                }
+            }
+            return s;
         }
 
         #endregion

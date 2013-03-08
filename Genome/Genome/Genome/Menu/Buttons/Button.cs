@@ -14,14 +14,13 @@ namespace Genome
     {
         private Vector2 topLeft;
         private Vector2 size;
-        private string texString;
         private Texture2D texture;
-        protected static MouseState prevState;
-        protected static MouseState state;
+        protected MouseState prevState;
+        protected MouseState state;
 
-        public Button(Vector2 topLeft, Vector2 size, string texString)
+        public Button(Vector2 topLeft, Vector2 size, TextureNames texString)
         {
-            texture = Simulation.getTexture(texString);
+            texture = Display.getTexture(texString);
             setLocation(topLeft, size);
         }
 
@@ -31,21 +30,18 @@ namespace Genome
             this.size = size;
         }
 
-        public bool hovered(MouseState mouseState)
+        public bool hovered()
         {
-            return mouseState.X > topLeft.X && mouseState.X < topLeft.X + size.X && mouseState.Y > topLeft.Y && mouseState.Y < topLeft.Y + size.Y;
+            return this.toRectangle().Contains(new Point((int)state.X, (int)state.Y));
         }
 
-        public void update(GameTime gameTime, MouseState mouseState)
+        public void update(GameTime gameTime)
         {
             prevState = state;
-            state = mouseState;
-            if (hovered(state))
+            state = Mouse.GetState();
+            if (prevState.LeftButton == ButtonState.Released && state.LeftButton == ButtonState.Pressed && this.hovered())
             {
-                if (state.LeftButton == ButtonState.Released && prevState.LeftButton == ButtonState.Pressed)
-                {
-                    clicked();
-                }
+                clicked();
             }
         }
 
@@ -57,6 +53,21 @@ namespace Genome
         public Texture2D getTexture()
         {
             return texture;
+        }
+
+        public float getHeight()
+        {
+            return size.Y;
+        }
+
+        public float getWidth()
+        {
+            return size.X;
+        }
+
+        public Vector2 getLocation()
+        {
+            return topLeft;
         }
 
         protected abstract void clicked();

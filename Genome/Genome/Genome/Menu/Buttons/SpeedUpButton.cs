@@ -11,15 +11,19 @@ using Microsoft.Xna.Framework.Media;
 
 namespace Genome
 {
-    class MenuButton : Button
+    class SpeedUpButton : Button
     {
-        public MenuButton(Vector2 topLeft) : base(topLeft, new Vector2(150, 50), TextureNames.MENU)
+        private WorldInputHandler inputHandler;
+
+        public SpeedUpButton(Vector2 topLeft, WorldInputHandler inputHandler)
+            : base(topLeft, new Vector2(35, 35), TextureNames.SPEEDUP)
         {
+            this.inputHandler = inputHandler;
         }
 
         protected override void clicked()
         {
-            Simulation.goToMenu();
+            inputHandler.speedUp();
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Genome
         {
             if (!isJudged) //should run through once
             {
-                aliveCreatures.Sort(judgeCreatures); //TODO: fix this so that the sorting is based on the correct criteria
+                aliveCreatures.Sort(judgeCreatures);
                 isJudged = true;
                 status = "Eliminating creatures...";
             }
