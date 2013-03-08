@@ -27,7 +27,7 @@ namespace Genome
         private static int numFoodUnitsPlant = 3;
         private static int numFoodUnitsRemains = 4;
 
-        private static int population = 1;
+        private static int population = 100;
         private static int plantPop = 10000;
         private static int obstacleNumber = 25000;
 

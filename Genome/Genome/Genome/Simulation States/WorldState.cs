@@ -33,7 +33,7 @@ namespace Genome
             get { return randomNumberGenerator; }
         }
         private int seed = 0;
-
+        private int creatureUpdated = 0;
         /// <summary>
         /// Starts a new world with a random seed
         /// </summary>
@@ -361,27 +361,31 @@ namespace Genome
         /// </summary>
         public void tick()
         {
-            foreach (Plant p in plantList)
+            if (creatureUpdated < creatureList.Count)
             {
-                p.tick();
+                creatureList[creatureUpdated].tick();
+                creatureUpdated++;
             }
-            foreach (Remains r in remainsList)
+            else
             {
-                r.tick();
-                if (r.fullyDecayed())
+                foreach (Plant p in plantList)
                 {
-                    int[] xy = r.getLocationXY();
-                    getTile(xy[1], xy[0]).clearTile();
-                    remainsList.Remove(r);
-                    r.setLocation(-1, -1);
+                    p.tick();
                 }
+                foreach (Remains r in remainsList)
+                {
+                    r.tick();
+                    if (r.fullyDecayed())
+                    {
+                        int[] xy = r.getLocationXY();
+                        getTile(xy[1], xy[0]).clearTile();
+                        remainsList.Remove(r);
+                        r.setLocation(-1, -1);
+                    }
+                }
+                creatureUpdated = 0;
+                Simulation.tick();
             }
-            for (int i = 0; i < creatureList.Count; i++)
-            {
-                creatureList[i].tick();
-            }
-
-            Simulation.tick();
         }
 
         /// <summary>
