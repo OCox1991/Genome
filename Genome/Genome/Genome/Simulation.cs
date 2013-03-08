@@ -16,20 +16,20 @@ namespace Genome
         private static List<Shape> recognisedShapes = new List<Shape>();
         private static int energyDrainPerTick = 5;
         private static int staminaRejuvenationPercent = 5;
-        private static int healthRejuvenationPercent = 5;
+        private static int healthRejuvenationPercent = 1;
 
-        private static int remainsFoodValue = 600;
-        private static int plantFoodValue = 300;
+        private static int remainsFoodValue = 1500;
+        private static int plantFoodValue = 750;
         private static int remainsFoodValueVariation = 2; // (1/x)
         private static int plantFoodValueVariation = 2;
         private static int numTicksPlantRegrow = 5000;
         private static int numTicksRemainsDecay = 7000;
-        private static int numFoodUnitsPlant = 30;
-        private static int numFoodUnitsRemains = 20;
+        private static int numFoodUnitsPlant = 3;
+        private static int numFoodUnitsRemains = 4;
 
-        private static int population = 1000;
-        private static int plantPop = 250;
-        private static int obstacleNumber = 500;
+        private static int population = 1;
+        private static int plantPop = 10000;
+        private static int obstacleNumber = 25000;
 
         private static int energyWeight = 2;
         private static int healthWeight = 3;
@@ -51,9 +51,6 @@ namespace Genome
         
         private static Color[] colourMap = { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo, Color.Violet }; //Remember this is from 0 to 6 so when drawing take 1 to get the desired colour.
         private static WorldState theWorld;
-        private static Creature selectedCreature;
-
-        private static Dictionary<string, Texture2D> textures;
 
         private static GraphicsDeviceManager graphics;
         private static SpriteBatch spriteBatch;
@@ -62,17 +59,46 @@ namespace Genome
         public Simulation()
         {
             parseShapes("shapes.txt");
-            state = new WorldState();
             currentRoundTime = 0;
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            graphics.PreferredBackBufferWidth = 853;
-            graphics.PreferredBackBufferHeight = 480;
+            graphics.PreferredBackBufferWidth = 1024;
+            graphics.PreferredBackBufferHeight = 768;
         }
 
         #region Methods
 
         #region Game rules related
+
+        public static int getNumTicks()
+        {
+            return currentRoundTime;
+        }
+
+        public static int getRoundLength()
+        {
+            return roundLengths;
+        }
+
+        public static void setRoundLength(int val)
+        {
+            roundLengths = val;
+        }
+
+        public static int getGeneration()
+        {
+            return currentGeneration;
+        }
+
+        public static int getTargetGeneration()
+        {
+            return numGenerations;
+        }
+
+        public static void setTargetGeneration(int val)
+        {
+            numGenerations = val;
+        }
 
         public static Color[] getColours()
         {
@@ -91,7 +117,7 @@ namespace Genome
 
         public static int getHealthRegenSpeed()
         {
-            return staminaRejuvenationPercent;
+            return healthRejuvenationPercent;
         }
 
         public static void setHealthRegenSpeed(int healthSpeed)
@@ -101,7 +127,7 @@ namespace Genome
 
         public static int getStaminaRegenSpeed()
         {
-            return healthRejuvenationPercent;
+            return staminaRejuvenationPercent;
         }
 
         public static void setStaminaRegenSpeed(int stamSpeed)
@@ -334,50 +360,62 @@ namespace Genome
 
         protected override void Initialize()
         {
-            //TODO: add code for initialising the world
+            base.Initialize();
+            this.IsMouseVisible = true;
             theWorld = new WorldState();
             state = theWorld;
-
-            base.Initialize();
         }
 
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             spriteFont = Content.Load<SpriteFont>("SpriteFont");
-            //using a dictionary to set up the textures to allow us to store metadata about them in the form of strings (as keys)
-            Dictionary<string, string> texList = new Dictionary<string, string>();
-            texList.Add("Empty Tile", "BlankTile");
-            texList.Add("Creature Tile", "Creature");
-            texList.Add("Obstacle Tile", "Obstacle");
-            texList.Add("Plant Tile", "Plant");
-            texList.Add("Remains Tile", "Remains");
+            //using a dictionary to set up the textures to allow us to store metadata about them in the form of an enum listing their names
+            Dictionary<TextureNames, string> texList = new Dictionary<TextureNames, string>();
+            texList.Add(TextureNames.EMPTY, "BlankTile");
+            texList.Add(TextureNames.CREATURE, "Creature");
+            texList.Add(TextureNames.OBSTACLE, "Obstacle");
+            texList.Add(TextureNames.PLANT, "Plant");
+            texList.Add(TextureNames.REMAINS, "Remains");
+            texList.Add(TextureNames.SPEEDUP, "plus");
+            texList.Add(TextureNames.SLOWDOWN, "minus");
+            texList.Add(TextureNames.MENU, "MenuButton");
+            texList.Add(TextureNames.TOP, "TopMenu");
+            texList.Add(TextureNames.CHANGEINFO, "ChangeInfo");
 
-            string[] texNames = texList.Keys.ToArray<string>();
+            TextureNames[] texNames = texList.Keys.ToArray<TextureNames>();
 
-            foreach (string s in texNames)
+            Dictionary<TextureNames, Texture2D>  textures = new Dictionary<TextureNames, Texture2D>();
+
+            foreach (TextureNames s in texNames)
             {
                 textures.Add(s, Content.Load<Texture2D>(texList[s]));
             }
 
-            base.LoadContent();
-        }
+            Display.setTextures(textures);
+            Display.setFont(spriteFont);
+            Display.setSpriteBatch(spriteBatch);
 
-        protected Texture2D getTexture(string textureDescription)
-        {
-            return textures[textureDescription];
+            base.LoadContent();
         }
 
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            state.update(gameTime);
+            if (numGenerations > currentGeneration || numGenerations == -1) 
+            {
+                state.update(gameTime);
+            }
         }
 
         protected override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
-            //TODO: Add code for drawing the top menu, which will be present on all screens
+            GraphicsDevice device = graphics.GraphicsDevice;
+            device.Clear(Color.White);
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
             state.draw();
         }
 

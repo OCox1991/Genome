@@ -12,7 +12,7 @@ namespace Genome
 
         }
 
-        public void selected()
+        protected override void selected()
         {
             menu.Options = menu.PrevOptions;
             menu.Description = menu.PrevDescription;

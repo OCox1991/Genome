@@ -5,11 +5,16 @@ using System.Text;
 
 namespace Genome
 {
-    class OptionsMenu : Menu
+    class JudgeDrawer
     {
-        public OptionsMenu() : base(new List<MenuOption>())
+        public JudgeDrawer()
         {
 
+        }
+
+        public void draw()
+        {
+            //TODO: Implement Judge drawing
         }
     }
 }

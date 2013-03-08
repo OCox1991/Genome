@@ -102,6 +102,20 @@ namespace Genome
         public Menu(List<MenuOption> options)
         {
             this.options = options;
+            init();
+        }
+
+        public Menu()
+        {
+            options = new List<MenuOption>();
+            init();
+        }
+
+        private void init()
+        {
+            prevOptions = new Stack<List<MenuOption>>();
+            prevTitle = new Stack<string>();
+            prevDescription = new Stack<string>();
         }
 
         public void deselect()

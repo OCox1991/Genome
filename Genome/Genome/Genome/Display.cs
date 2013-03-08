@@ -13,7 +13,11 @@ namespace Genome
 {
     class Display
     {
-        public Display()
+        private static Dictionary<TextureNames, Texture2D> textures = new Dictionary<TextureNames, Texture2D>();
+        private static SpriteFont spriteFont;
+        private static SpriteBatch spriteBatch;
+
+        private Display()
         {
         }
 
@@ -75,6 +79,55 @@ namespace Genome
         public static float getTileSize()
         {
             return 40;
+        }
+
+        public static void setTextures(Dictionary<TextureNames, Texture2D> theTextures)
+        {
+            textures = theTextures;
+        }
+
+        public static Texture2D getTexture(TextureNames texDescription)
+        {
+            return textures[texDescription];
+        }
+
+        public static void setFont(SpriteFont font)
+        {
+            spriteFont = font;
+        }
+
+        public static SpriteFont getFont()
+        {
+            return spriteFont;
+        }
+
+        public static void setSpriteBatch(SpriteBatch batch)
+        {
+            spriteBatch = batch;
+        }
+
+        public static SpriteBatch getSpriteBatch()
+        {
+            return spriteBatch;
+        }
+
+        public static Vector2 measureString(string s)
+        {
+            return spriteFont.MeasureString(s);
+        }
+
+        public static void drawButton(Button b)
+        {
+            spriteBatch.Begin();
+            if (b.hovered())
+            {
+                spriteBatch.Draw(b.getTexture(), new Rectangle((int)b.getLocation().X, (int)b.getLocation().Y, (int)b.getWidth(), (int)b.getHeight()), Color.Gray);
+            }
+            else
+            {
+                spriteBatch.Draw(b.getTexture(), new Rectangle((int)b.getLocation().X, (int)b.getLocation().Y, (int)b.getWidth(), (int)b.getHeight()), Color.White);
+            }
+            spriteBatch.End();
         }
     }
 }

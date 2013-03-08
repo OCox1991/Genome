@@ -14,6 +14,7 @@ namespace Genome
         private bool inCombat;
         private bool stealth;
         private Creature inCombatWith;
+        Random random;
 
 
         #region stats
@@ -26,7 +27,7 @@ namespace Genome
         private int speed;
         private int awareness;
         private int defence;
-        private Decimal diet;
+        private double diet;
         private int[] colour;
         private int stealthVal;
 
@@ -40,18 +41,18 @@ namespace Genome
         public Creature()
         {
             dna = new Gene();
-            init();
+            init(WorldState.RandomNumberGenerator);
         }
 
         public Creature(Gene dna)
         {
             this.dna = dna;
-            init();
+            init(WorldState.RandomNumberGenerator);
         }
 
-        private void init()
+        private void init(Random r)
         {
-            world = Simulation.getCurrentWorld();
+            this.random = r;
             colour = new int[3];
             setLocation(-1, -1);
 
@@ -67,46 +68,53 @@ namespace Genome
             speed = 50;
             defence = 50;
             stealthVal = 50;
-
-            foreach (ParamToken p in dna.getPosMods())
+            maxHealth = 100;
+            diet = 0.5;
+            if (dna.getPosMods().Count > 0)
             {
-                switch (p)
+                foreach (ParamToken p in dna.getPosMods())
                 {
-                    case ParamToken.AWARE: awareness++;
-                        break;
-                    case ParamToken.DEFENCE: defence++;
-                        break;
-                    case ParamToken.ENERGY: initEnergy++;
-                        break;
-                    case ParamToken.HEALTH: maxHealth++;
-                        break;
-                    case ParamToken.SPEED: speed++;
-                        break;
-                    case ParamToken.STEALTHVAL: stealthVal++;
-                        break;
-                    case ParamToken.STRENGTH: strength++;
-                        break;
+                    switch (p)
+                    {
+                        case ParamToken.AWARE: awareness++;
+                            break;
+                        case ParamToken.DEFENCE: defence++;
+                            break;
+                        case ParamToken.ENERGY: initEnergy++;
+                            break;
+                        case ParamToken.HEALTH: maxHealth++;
+                            break;
+                        case ParamToken.SPEED: speed++;
+                            break;
+                        case ParamToken.STEALTHVAL: stealthVal++;
+                            break;
+                        case ParamToken.STRENGTH: strength++;
+                            break;
+                    }
                 }
             }
 
-            foreach (ParamToken p in dna.getNegMods())
+            if (dna.getNegMods().Count > 0)
             {
-                switch (p)
+                foreach (ParamToken p in dna.getNegMods())
                 {
-                    case ParamToken.AWARE: awareness--;
-                        break;
-                    case ParamToken.DEFENCE: defence--;
-                        break;
-                    case ParamToken.ENERGY: initEnergy--;
-                        break;
-                    case ParamToken.HEALTH: maxHealth--;
-                        break;
-                    case ParamToken.SPEED: speed--;
-                        break;
-                    case ParamToken.STEALTHVAL: stealthVal--;
-                        break;
-                    case ParamToken.STRENGTH: strength--;
-                        break;
+                    switch (p)
+                    {
+                        case ParamToken.AWARE: awareness--;
+                            break;
+                        case ParamToken.DEFENCE: defence--;
+                            break;
+                        case ParamToken.ENERGY: initEnergy--;
+                            break;
+                        case ParamToken.HEALTH: maxHealth--;
+                            break;
+                        case ParamToken.SPEED: speed--;
+                            break;
+                        case ParamToken.STEALTHVAL: stealthVal--;
+                            break;
+                        case ParamToken.STRENGTH: strength--;
+                            break;
+                    }
                 }
             }
 
@@ -127,15 +135,24 @@ namespace Genome
             behaviour = new Dictionary<Scenario, Response>();
             behaviour.Add(Scenario.NOTHING, Response.RANDOM);
             Scenario[] scenarios = Scenario.NOTHING.AllScenarios();
-            Response[] responses = new Response[15];
+            Response[] responses = new Response[scenarios.Length];
             int scenariosChecked = 0;
             int i;
             int j;
-            for (i = 1; i < dna.getSizeX(); i += 2)
+            for (i = 1; i < dna.getSizeX() - 1; i += 2)
             {
-                for (j = 1; j < dna.getSizeY(); j += 2)
+                for (j = 1; j < dna.getSizeY() - 1; j += 2)
                 {
-                    responses[scenariosChecked] = scenarios[scenariosChecked].PossibleResponses()[dna.poll(i, j) - 1] ; //- 1 here since colours are 1 to 7 and possible responses are 0 to 6
+                    if (scenariosChecked < responses.Length)
+                    {
+                        responses[scenariosChecked] = scenarios[scenariosChecked].PossibleResponses()[dna.poll(i, j)];
+                        scenariosChecked++;
+                    }
+                    else
+                    {
+                        i = dna.getSizeX();
+                        j = dna.getSizeY();
+                    }
                 }
             }
             for (i = 0; i < responses.Length; i++)
@@ -197,6 +214,11 @@ namespace Genome
             return speed + awareness + defence + maxHealth + initEnergy + stealthVal + strength;
         }
 
+        public void setWorld(WorldState world)
+        {
+            this.world = world;
+        }
+
         #endregion
 
         public void tick()
@@ -204,7 +226,7 @@ namespace Genome
             #region 1. Rejuvenate
             if (health < maxHealth - ((maxHealth / 100) * Simulation.getHealthRegenSpeed()))
             {
-                health += ((maxHealth / 100) * Simulation.getHealthRegenSpeed());
+                health += (int)(((double)maxHealth / 100.0) * (double)Simulation.getHealthRegenSpeed());
             }
             else if(health < maxHealth)
             {
@@ -213,7 +235,7 @@ namespace Genome
 
             if (stamina < maxStamina - ((maxStamina / 100) * Simulation.getStaminaRegenSpeed()))
             {
-                stamina += ((maxStamina / 100) * Simulation.getStaminaRegenSpeed());
+                stamina += (int)(((double)maxStamina / 100) * (double)Simulation.getStaminaRegenSpeed());
             }
             else if (stamina < maxStamina)
             {
@@ -221,10 +243,11 @@ namespace Genome
             }
             #endregion
             #region 2. Drain energy
-            energy -= Simulation.getEnergyDrainPerTick();
+            drainEnergy(Simulation.getEnergyDrainPerTick(), false);
             #endregion
             #region 3. Look Around
-            ArrayList l = world.scan(getLocationXY(), awareness);
+            ArrayList l = new ArrayList();
+            l = world.scan(getLocationXY(), awareness);
             List<Creature> cl = (List<Creature>)l[0];
             List<Plant> pl = (List<Plant>)l[1];
             List<Remains> rl = (List<Remains>)l[2];
@@ -262,7 +285,7 @@ namespace Genome
                 {
                     s = Scenario.IN_COMBAT_CREATURE;
                 }
-                else if(maxHealth/health < Simulation.getWoundedHealthPercent())
+                else if((double)maxHealth/(double)health < (double)Simulation.getWoundedHealthPercent())
                 {
                     s = Scenario.IN_COMBAT_WOUNDED;
                 }
@@ -314,7 +337,7 @@ namespace Genome
                 }
                 #endregion
             }
-            else if (foodCount == 1) //1 food visible
+            else if (foodCount == 1)
             {
                 #region single food
                 
@@ -404,6 +427,9 @@ namespace Genome
                 case Response.RANDOM: randomAction(); break;
             }
             #endregion
+#if DEBUG
+            Console.WriteLine("Creature At: (" + getLocationXY()[0] + " , " + getLocationXY()[1] + ")");
+#endif
         }
 
         
@@ -416,14 +442,13 @@ namespace Genome
         /// <returns>True if the creature is not hidden, false if the creature is hidden</returns>
         private bool canSee(Creature c)
         {
-            Random r = new Random();
             bool b = true;
             double i = getEuclideanDistanceFrom(c);
             if (i > awareness)
             {
                 b = false;
             }
-            else if(r.Next(100) < c.getStealthVal() + (i - awareness))
+            else if(random.Next(100) < c.getStealthVal() + (i - awareness))
             {
                 b = false;
             }
@@ -620,6 +645,7 @@ namespace Genome
         {
             int leastDist = int.MaxValue;
             FoodSource retFood = null;
+            List<FoodSource> removeFood = new List<FoodSource>();
             foreach (FoodSource f in food)
             {
                 if (foodIsPreferred(f))
@@ -630,10 +656,6 @@ namespace Genome
                         leastDist = d;
                         retFood = f;
                     }
-                }
-                else
-                {
-                    food.Remove(f);
                 }
             }
             return retFood;
@@ -697,23 +719,31 @@ namespace Genome
 
         public void drainEnergy(int energyAmt)
         {
-            if (energy <= energyAmt)
+            drainEnergy(energyAmt, true);
+        }
+
+        public void drainEnergy(int energyAmt, bool drainStam)
+        {
+            if (energy >= energyAmt) //if have more energy than will be drained
             {
                 energy -= energyAmt;
             }
-            else
+            else //otherwise
             {
                 energyAmt -= energy;
                 energy = 0;
-                damage(energyAmt);
+                damage(energyAmt * 2);
             }
-            if (stamina > energyAmt)
+            if (drainStam)
             {
-                stamina -= energyAmt;
-            }
-            else
-            {
-                stamina = 0;
+                if (stamina > energyAmt)
+                {
+                    stamina -= energyAmt;
+                }
+                else
+                {
+                    stamina = 0;
+                }
             }
         }
 
@@ -768,22 +798,29 @@ namespace Genome
         /// <param name="f">The foodsource to eat from</param>
         public void eat(FoodSource f)
         {
-            if (isAdjacent(f))
+            if (f == null)
             {
-                if (stamina == maxStamina)
-                {
-                    f.beEaten();
-                    energy += getNourishmentAmt(f);
-                    stamina /= (100/50); //could be set by Simulation 
-                }
-                else
-                {
-                    //wait for stamina to increase
-                }
+                randomAction();
             }
             else
             {
-                moveTowards(f);
+                if (isAdjacent(f))
+                {
+                    if (stamina == maxStamina)
+                    {
+                        f.beEaten();
+                        energy += getNourishmentAmt(f);
+                        stamina /= (100 / 50); //div 50 could be settable by Simulation 
+                    }
+                    else
+                    {
+                        //wait for stamina to increase
+                    }
+                }
+                else
+                {
+                    moveTowards(f);
+                }
             }
         }
 
@@ -797,6 +834,10 @@ namespace Genome
             {
                 eat(f);
             }
+            else
+            {
+                randomAction();
+            }
         }
 
         /// <summary>
@@ -807,7 +848,7 @@ namespace Genome
         {
             if (isAdjacent(otherCreature))
             {
-                int winnerEnergy = 10;
+                int winnerEnergy = 10; //TODO: make these editable
                 int loserEnergy = 20;
 
                 otherCreature.attacked(this);
@@ -847,12 +888,11 @@ namespace Genome
         /// <returns>A value which consists of a number of randomly generated numbers where each x triggers another number to be generated and added to the total</returns>
         private int rand(int x)
         {
-            Random r = new Random();
             int returnVal = 0;
             int randVal;
             do
             {
-                randVal = r.Next(x) + 1;
+                randVal = random.Next(x) + 1;
                 returnVal += randVal;
             }
             while (randVal == x);
@@ -922,14 +962,22 @@ namespace Genome
             {
                 if(canAct(energyCost)) //if it can afford the energy cost
                 {
-                    world.clearTile(getLocationXY()[1], getLocationXY()[0]); //clear old tile
-                    world.addCreature(getLocationXY()[0], getLocationXY()[1], this); //add to new tile
+                    world.clearTile(getLocationXY()[0], getLocationXY()[1]);
+                    this.setLocation(newLoc[0], newLoc[1]); //update location
+                    world.addCreature(newLoc[0], newLoc[1], this);
                     this.drainEnergy(energyCost); //drain energy 
                 }
             }
             else if (world.creatureAt(getLocationXY()[1], getLocationXY()[0]))
             {
                 world.getCreatureAt(getLocationXY()[1], getLocationXY()[0]).spotted();
+            }
+            else
+            {
+                if (!surrounded())
+                {
+                    move(dir.right());
+                }
             }
         }
 
@@ -1131,7 +1179,7 @@ namespace Genome
         /// <param name="cl">The list of visible creatures</param>
         private void ignoreNonPrefFood(List<Plant> pl, List<Remains> rl, List<Creature> cl)
         {
-            if (diet <= 0.5M)
+            if (diet <= 0.5)
             {
                 if (pl.Count == 0)
                 {
@@ -1146,7 +1194,7 @@ namespace Genome
                     ignoreCreature(pl, new List<Remains>());
                 }
             }
-            else if (diet > 0.5M)
+            else if (diet > 0.5)
             {
                 if (rl.Count == 0)
                 {
@@ -1161,6 +1209,28 @@ namespace Genome
                     ignoreCreature(new List<Plant>(), rl);
                 }
             }
+        }
+
+        /// <summary>
+        /// Used in move() to avoid infinite loops, the idea being that the creature tries other moves until it finds one it can make if it is blocked, the problem being that if it is blocked
+        /// on all sides it will trap the program
+        /// </summary>
+        /// <returns>A bool representing if the creature is surrounded on all sides by impassible objects</returns>
+        private bool surrounded()
+        {
+            bool isSurrounded = true;
+            Direction[] d = new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.NORTHEAST, Direction.NORTHWEST, Direction.SOUTHEAST, Direction.SOUTHWEST};
+            int i = 0;
+            while (i < d.Length && isSurrounded)
+            {
+                int[] loc = getLocationFromDirection(d[i]);
+                if(world.tileIsClear(loc[1], loc[0]))
+                {
+                    isSurrounded = false;
+                }
+                i++;
+            }
+            return isSurrounded;
         }
 
         #region user manual controls

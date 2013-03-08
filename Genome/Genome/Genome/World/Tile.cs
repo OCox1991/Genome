@@ -12,6 +12,7 @@ namespace Genome
         private Remains remains;
         private Obstacle obstacle;
 
+
         private Boolean isBlocked;
 
         public Tile()
@@ -67,9 +68,9 @@ namespace Genome
             return remains;
         }
 
-        public void addObstacle()
+        public void addObstacle(Obstacle o)
         {
-            obstacle = new Obstacle();
+            obstacle = o;
             isBlocked = true;
         }
 

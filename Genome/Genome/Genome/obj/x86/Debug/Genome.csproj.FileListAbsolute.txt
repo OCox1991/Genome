@@ -2,3 +2,19 @@ C:\Users\Owen\Documents\Work\C# Projects\Genome\Genome\Genome\obj\x86\Debug\Reso
 C:\Users\Owen\Documents\Work\C# Projects\Genome\Genome\Genome\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
 C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\BlankTile.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Creature.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\GameThumbnail.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Obstacle.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Plant.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Remains.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\ChangeInfo.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\MenuButton.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\minus.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\plus.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\TopMenu.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\SpriteFont.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Genome.exe
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Genome.pdb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\obj\x86\Debug\Genome.exe
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\obj\x86\Debug\Genome.pdb

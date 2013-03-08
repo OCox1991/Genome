@@ -47,7 +47,9 @@ namespace Genome
 
         public int[] getRelativeLocation(WorldObject o)
         {
-            return new int[] { o.getLocationXY()[0] - this.getLocationXY()[0], o.getLocationXY()[1] - this.getLocationXY()[1] };
+            int locX = o.getLocationXY()[0] - this.getLocationXY()[0];
+            int locY = o.getLocationXY()[1] - this.getLocationXY()[1];
+            return new int[] { locX, locY };
         }
 
         public Direction getDirectionTo(WorldObject o)
@@ -132,7 +134,7 @@ namespace Genome
 
         public bool isAdjacent(WorldObject o)
         {
-            int[] loc = o.getRelativeLocation(o);
+            int[] loc = this.getRelativeLocation(o);
             int locX = loc[0];
             int locY = loc[1];
             bool b = false;

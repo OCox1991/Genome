@@ -19,7 +19,6 @@ namespace Genome
         private int worldX = 1000;
         private int worldY = 1000;
 
-        private WorldDrawer drawer;
         private WorldInputHandler inputHandler;
 
         private List<Creature> creatureList;
@@ -28,7 +27,11 @@ namespace Genome
 
         private Stack<Creature> deadList;
 
-        private Random randomNumberGenerator;
+        private static Random randomNumberGenerator;
+        public static Random RandomNumberGenerator
+        {
+            get { return randomNumberGenerator; }
+        }
         private int seed = 0;
 
         /// <summary>
@@ -39,8 +42,8 @@ namespace Genome
             Random r = new Random();
             seed = r.Next(100000);
             randomNumberGenerator = new Random(seed);
-            deadList = new Stack<Creature>();
             setUpWorld();
+            addCreatures();
         }
 
         public void reset()
@@ -65,10 +68,9 @@ namespace Genome
 
         public void setUpWorld()
         {
-            Vector2 TL = new Vector2(150, 0); //The top left of that area to actually draw the world in
+            Vector2 TL = new Vector2(0, 150); //The top left of that area to actually draw the world in
             inputHandler = new WorldInputHandler(TL, new Vector2(1024 - TL.X, 768 - TL.Y), this);
-            drawer = new WorldDrawer(this);
-
+            deadList = new Stack<Creature>();
             plantList = new List<Plant>();
             remainsList = new List<Remains>();
             tiles = new Tile[worldX][];
@@ -82,7 +84,6 @@ namespace Genome
                     tiles[i][j] = new Tile();
                 }
             }
-
             populateWorld();
         }
 
@@ -101,7 +102,10 @@ namespace Genome
                 else
                 {
                     Tile t = getTile(xy[1], xy[0]);
-                    t.addPlant(new Plant(randomNumberGenerator));
+                    Plant p = new Plant(randomNumberGenerator);
+                    p.setLocation(xy[0], xy[1]);
+                    plantList.Add(p);
+                    t.addPlant(p);
                 }
             }
             for (int obstNum = 0; obstNum < Simulation.getNumObstacles(); obstNum++)
@@ -114,7 +118,9 @@ namespace Genome
                 else
                 {
                     Tile t = getTile(xy[1], xy[0]);
-                    t.addObstacle();
+                    Obstacle o = new Obstacle();
+                    o.setLocation(xy[0], xy[1]);
+                    t.addObstacle(o);
                 }
             }
         }
@@ -149,9 +155,9 @@ namespace Genome
         private void placeCreatures()
         {
             creatureList.Sort(sortCreaturesBySpeed);
-            for (int i = 0; i < creatureList.Count; i++)
+            foreach (Creature c in creatureList)
             {
-                Creature c = creatureList[i];
+                c.setWorld(this);
                 addCreature(c);
             }
         }
@@ -167,7 +173,7 @@ namespace Genome
             int attempts = 0;
             bool found = false;
 
-            while (!found && attempts < 5) //This is the number of times the program will attempt to place the creature before giving up
+            while (!found && attempts < 25) //This is the number of times the program will attempt to place the creature before giving up
             {
                 xLoc = randomNumberGenerator.Next(worldX);
                 yLoc = randomNumberGenerator.Next(worldY);
@@ -186,19 +192,21 @@ namespace Genome
                 yLoc = 0;
                 while (!found)
                 {
-                    while (yLoc < tiles.Length)
+                    while (yLoc < tiles.Length - 1)
                     {
-                        while (xLoc < tiles[yLoc].Length)
+                        while (xLoc < tiles[yLoc].Length - 1)
                         {
-                            xLoc++;
+                            
                             if (tileIsClear(yLoc, xLoc))
                             {
                                 xLoc--;
                                 yLoc--;
                                 found = true;
                             }
+                            xLoc++;
                         }
                         yLoc++;
+                        xLoc = 0;
                     }
                     if (!found)
                     {
@@ -219,11 +227,11 @@ namespace Genome
         /// <returns>A list of all the interesting things found in the scan</returns>
         public ArrayList scan(int[] locationXY, int radius)
         {
-            ArrayList a = new ArrayList();
-            a[0] = new List<Creature>();
-            a[1] = new List<Plant>();
-            a[2] = new List<Remains>();
-            a[3] = new List<Obstacle>();
+            ArrayList a = new ArrayList(4);
+            a.Add(new List<Creature>());
+            a.Add(new List<Plant>());
+            a.Add(new List<Remains>());
+            a.Add(new List<Obstacle>());
 
             int x = locationXY[0];
             int y = locationXY[1];
@@ -260,8 +268,12 @@ namespace Genome
                                 }
                                 else if (t.plantPresent())
                                 {
-                                    List<Plant> lp = (List<Plant>)a[1];
-                                    lp.Add(t.getPlant());
+                                    Plant p = t.getPlant();
+                                    if (p.canBeEaten())
+                                    {
+                                        List<Plant> lp = (List<Plant>)a[1];
+                                        lp.Add(p);
+                                    }
                                 }
                                 else if (t.remainsPresent())
                                 {
@@ -289,7 +301,26 @@ namespace Genome
         /// <returns>The tile found at the given row and column</returns>
         public Tile getTile(int row, int col)
         {
-            return tiles[col][row];
+            Tile t = null;
+            if (col < 0 || col > tiles.Length - 1)
+            {
+                t = new Tile();
+                Obstacle o = new Obstacle();
+                o.setLocation(col, row);
+                t.addObstacle(o);
+            }
+            else if (row < 0 || row > tiles[col].Length - 1)
+            {
+                t = new Tile();
+                Obstacle o = new Obstacle();
+                o.setLocation(col, row);
+                t.addObstacle(o);
+            }
+            else
+            {
+                t = tiles[col][row];
+            }
+            return t;
         }
 
         /// <summary>
@@ -301,6 +332,7 @@ namespace Genome
         public void addCreature(int x, int y, Creature c)
         {
             getTile(y, x).addCreature(c);
+            c.setLocation(x, y);
         }
 
         /// <summary>
@@ -310,9 +342,7 @@ namespace Genome
         public void addCreature(Creature c)
         {
             int[] clearTile = getRandomClearTile();
-
-            c.setLocation(clearTile[0], clearTile[1]);
-            getTile(clearTile[1], clearTile[0]).addCreature(c);
+            addCreature(clearTile[0], clearTile[1], c);
         }
 
         /// <summary>
@@ -323,7 +353,7 @@ namespace Genome
         /// <returns>True is the tile is empty, false otherwise</returns>
         public bool tileIsClear(int row, int col)
         {
-            return getTile(row, col).isImpassible();
+            return !(getTile(row, col).isImpassible());
         }
 
         /// <summary>
@@ -367,6 +397,7 @@ namespace Genome
 
             Remains r = new Remains(randomNumberGenerator);
             r.setLocation(loc[0], loc[1]);
+            remainsList.Add(r);
             getTile(loc[1], loc[0]).addRemains(r);
             deadList.Push(c);
         }
@@ -489,16 +520,19 @@ namespace Genome
 
         public override void update(GameTime gameTime)
         {
-            for (int i = 0; i < inputHandler.getSpeed(); i++)
+            //TODO: add waiting stuff here. (Timer - gameTime) if Timer <= 0 then Timer = maxTimer - Timer and tick, so for ex speed 2 we divide the current val of timer by 2
+            int speed = inputHandler.getSpeed();
+            for (int i = 0; i < speed; i++)
             {
                 tick(); //tick x times based on the speed specified by the simulation
             }
+            //TODO: End waiting stuff here, inputhandler should ALWAYS update
             inputHandler.update(gameTime);
         }
 
         public override void draw()
         {
-            drawer.draw();
+            inputHandler.draw();
         }
     }
 }

@@ -22,8 +22,7 @@ namespace Genome
         STARVING_MULT_CREATURE_FOOD,
         CREATURE_MULT_FOOD,
         MULT_CREATURE_MULT_FOOD,
-        MULT_FOOD,
-        DEPLETED_PLANT,
+        MULT_FOOD
     }
 
     public enum Response
@@ -106,8 +105,6 @@ namespace Genome
                     break;
                 case Scenario.MULT_FOOD: responses = new Response[] { Response.EAT_CLOSEST, Response.EAT_CLOSEST_PREFERRED, Response.EAT_LEAST_DANGEROUS, Response.EAT_MOST_EFFICIENT, Response.EAT_MOST_REMAINING, Response.EAT_MOST_NOURISHING, Response.EAT_CLOSEST_PREFERRED };
                     break;
-                case Scenario.DEPLETED_PLANT: responses = new Response[] { Response.WAIT, Response.IGNORE, Response.IGNORE, Response.IGNORE, Response.IGNORE, Response.IGNORE, Response.IGNORE };
-                    break;
                 case Scenario.NOTHING: responses = new Response[] { Response.RANDOM, Response.RANDOM, Response.RANDOM, Response.RANDOM, Response.RANDOM, Response.RANDOM, Response.RANDOM };
                     break;
             }
@@ -116,7 +113,7 @@ namespace Genome
 
         public static Scenario[] AllScenarios(this Scenario self)
         {
-            return new Scenario[] { Scenario.CREATURE, Scenario.CREATURE_FOOD, Scenario.CREATURE_MULT_FOOD, Scenario.DEPLETED_PLANT, Scenario.FOOD, Scenario.IN_COMBAT, Scenario.IN_COMBAT_CREATURE, 
+            return new Scenario[] { Scenario.CREATURE, Scenario.CREATURE_FOOD, Scenario.CREATURE_MULT_FOOD, Scenario.FOOD, Scenario.IN_COMBAT, Scenario.IN_COMBAT_CREATURE, 
                                     Scenario.IN_COMBAT_WOUNDED, Scenario.MULT_CREATURE, Scenario.MULT_CREATURE_FOOD, Scenario.MULT_CREATURE_MULT_FOOD, Scenario.MULT_FOOD, Scenario.STARVING_CREATURE_FOOD, 
                                     Scenario.STARVING_FOOD, Scenario.STARVING_MULT_CREATURE_FOOD };
         }
