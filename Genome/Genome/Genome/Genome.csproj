@@ -108,47 +108,54 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Animals\Creature.cs" />
-    <Compile Include="Animals\Scenarios.cs" />
-    <Compile Include="Menu\Buttons\SlowDownButton.cs" />
-    <Compile Include="Menu\Buttons\SpeedUpButton.cs" />
-    <Compile Include="Simulation States\Drawing Classes\JudgeDrawer.cs" />
-    <Compile Include="Menu\Buttons\Button.cs" />
+    <Compile Include="Simulation States\Drawing Classes\InputGetterDrawer.cs" />
+    <Compile Include="Simulation States\Drawing Classes\MenuBranchDrawer.cs" />
+    <Compile Include="Simulation States\Menu\Buttons\MainMenuButtons.cs" />
+    <Compile Include="Simulation States\Menu\Buttons\OptionButton.cs" />
+    <Compile Include="Simulation States\Menu\MainMenuState.cs" />
+    <Compile Include="Simulation States\Menu\Menu.cs" />
+    <Compile Include="Simulation States\Menu\MenuOptions\BoolLeafOption.cs" />
+    <Compile Include="Simulation States\Menu\MenuOptions\BranchOption.cs" />
+    <Compile Include="Simulation States\Menu\MenuOptions\InputGetterOption.cs" />
+    <Compile Include="Simulation States\Menu\MenuOptions\IntLeafOption.cs" />
+    <Compile Include="Simulation States\Menu\MenuOptions\LeafOption.cs" />
+    <Compile Include="Simulation States\Menu\MenuOptions\MenuOption.cs" />
+    <Compile Include="Simulation States\OptionsState.cs" />
+    <Compile Include="Simulation States\World\Animals\Creature.cs" />
+    <Compile Include="Simulation States\World\Animals\Scenarios.cs" />
+    <Compile Include="Simulation States\Menu\Buttons\BackButton.cs" />
+    <Compile Include="Simulation States\Menu\Buttons\SlowDownButton.cs" />
+    <Compile Include="Simulation States\Menu\Buttons\SpeedUpButton.cs" />
+    <Compile Include="Simulation States\Menu\Buttons\TextButton.cs" />
+    <Compile Include="Simulation States\Menu\Buttons\ViewMoreInfoButton.cs" />
+    <Compile Include="Simulation States\Drawing Classes\SingleStringDrawer.cs" />
+    <Compile Include="Simulation States\Menu\Buttons\Button.cs" />
     <Compile Include="Display.cs" />
-    <Compile Include="Genes\Cell.cs" />
-    <Compile Include="Genes\Gene.cs" />
-    <Compile Include="Genes\ParamToken.cs" />
-    <Compile Include="Genes\Shape.cs" />
-    <Compile Include="Menu\BackMenuOption.cs" />
-    <Compile Include="Menu\BranchMenuOption.cs" />
-    <Compile Include="Menu\Buttons\MenuButton.cs" />
-    <Compile Include="Menu\IntLeafMenuOption.cs" />
-    <Compile Include="Menu\Menu.cs" />
-    <Compile Include="Menu\MenuOption.cs" />
-    <Compile Include="Simulation States\Drawing Classes\Textures.cs" />
-    <Compile Include="Simulation States\OptionsMenuState.cs" />
+    <Compile Include="Simulation States\World\Animals\Genes\Cell.cs" />
+    <Compile Include="Simulation States\World\Animals\Genes\Gene.cs" />
+    <Compile Include="Simulation States\World\Animals\Genes\ParamToken.cs" />
+    <Compile Include="Simulation States\World\Animals\Genes\Shape.cs" />
+    <Compile Include="Simulation States\Menu\Buttons\MenuButton.cs" />
+    <Compile Include="Simulation States\Drawing Classes\TextureNames.cs" />
+    <Compile Include="Simulation States\InitialisationState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Simulation States\Drawing Classes\MainMenuDrawer.cs" />
-    <Compile Include="Simulation States\Drawing Classes\OMenuDrawer.cs" />
     <Compile Include="Simulation States\JudgingState.cs" />
-    <Compile Include="Simulation States\MainMenuState.cs" />
     <Compile Include="Simulation States\SimulationState.cs" />
     <Compile Include="Simulation States\Drawing Classes\WorldDrawer.cs" />
-    <Compile Include="World\WorldInputHandler.cs" />
-    <Compile Include="World\WorldObject.cs" />
-    <Compile Include="World\Direction.cs" />
-    <Compile Include="World\FoodSource.cs" />
-    <Compile Include="World\Obstacle.cs" />
-    <Compile Include="World\Plant.cs" />
-    <Compile Include="World\Remains.cs" />
-    <Compile Include="World\Tile.cs" />
+    <Compile Include="Simulation States\World\WorldInputHandler.cs" />
+    <Compile Include="Simulation States\World\WorldObject.cs" />
+    <Compile Include="Simulation States\World\Direction.cs" />
+    <Compile Include="Simulation States\World\FoodSource.cs" />
+    <Compile Include="Simulation States\World\Obstacle.cs" />
+    <Compile Include="Simulation States\World\Plant.cs" />
+    <Compile Include="Simulation States\World\Remains.cs" />
+    <Compile Include="Simulation States\World\Tile.cs" />
     <Compile Include="Simulation States\WorldState.cs" />
     <Compile Include="Simulation.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
-    <Content Include="Genes\Shapes.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GenomeContent\GenomeContent.contentproj">

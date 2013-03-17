@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -11,55 +12,65 @@ using Microsoft.Xna.Framework.Media;
 
 namespace Genome
 {
-    class Simulation : Microsoft.Xna.Framework.Game
+    class Simulation : Game
     {
+        private static Simulation currentSimulation;
+
         private static List<Shape> recognisedShapes = new List<Shape>();
-        private static int energyDrainPerTick = 5;
-        private static int staminaRejuvenationPercent = 5;
-        private static int healthRejuvenationPercent = 1;
 
-        private static int remainsFoodValue = 1500;
-        private static int plantFoodValue = 750;
-        private static int remainsFoodValueVariation = 2; // (1/x)
-        private static int plantFoodValueVariation = 2;
-        private static int numTicksPlantRegrow = 5000;
-        private static int numTicksRemainsDecay = 7000;
-        private static int numFoodUnitsPlant = 3;
-        private static int numFoodUnitsRemains = 4;
+        private static int remainsFoodValue = 1500; //flat
+        private static int plantFoodValue = 750; //flat
+        private static int remainsFoodValueVariation = 2; //  +- (1/x)
+        private static int plantFoodValueVariation = 2; // +- 1/x
+        private static int numTicksPlantRegrow = 750; //flat
+        private static int numTicksRemainsDecay = 500; //flat
+        private static int numFoodUnitsPlant = 3; //flat
+        private static int numFoodUnitsRemains = 4; //flat
 
-        private static int population = 100;
-        private static int plantPop = 10000;
-        private static int obstacleNumber = 25000;
+        private static int population = 1; //flat
+        private static int plantPop = 10000; //flat
+        private static int obstacleNumber = 25000; //flat
 
-        private static int energyWeight = 2;
-        private static int healthWeight = 3;
+        //judging
+        private static int energyWeight = 2; //energy * x
+        private static int healthWeight = 3;//health * x
+        private static int topPercentage = 25; //top x% are the best performers, their children make up 50% of the next gen
+        private static int elimPercentage = 25; //bottom x% eliminated
 
-        private static int starvingEnergyLevel = 250;
-        private static int woundedHealthPercent = 15;
-        private static int topPercentage = 25; //top 25%
-        private static int elimPercentage = 25; //bottom 25%
+        //creatures
+        private static int starvingEnergyLevel = 250; //flat
+        private static int woundedHealthPercent = 15; //%age
 
-        private static int roundLengths = 10000;
-        private static int currentRoundTime;
+        private static int energyDrainPerTick = 5; //flat
+        private static int staminaRejuvenationPercent = 1; //%age
+        private static int healthRejuvenationPercent = 1; //%age
 
-        private static int numGenerations = -1;
-        private static int currentGeneration = 1;
+        //Round rules
+        private static int roundLengths = 10000; //flat
+        private static int currentRoundTime; //counter
 
-        private static SimulationState prevState;
-        private static SimulationState state;
+        private static int numGenerations = -1; //targer generation, we will normally reach here and then stop
+        private static int currentGeneration = 1; //the current gen
 
-        
-        private static Color[] colourMap = { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo, Color.Violet }; //Remember this is from 0 to 6 so when drawing take 1 to get the desired colour.
-        private static WorldState theWorld;
+        private static bool goToJudgeOnDeath = true; //boolean representing if we immediately judge a generation once its last member dies out
+        private static bool followOnClick = true; //boolean representing if we follow the selected creature/plant/remains when clicked on
 
+        //TODO: display stuff: needs to be moved to Display
+        private static Color[] colourMap = { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo, Color.Violet };
         private static GraphicsDeviceManager graphics;
         private static SpriteBatch spriteBatch;
         private static SpriteFont spriteFont;
 
+        //Simulation class inner workings
+        private static SimulationState state; //the current sim state, all update and draw methods point to this
+        private static WorldState theWorld; //the world, stored since it needs to be kept consistent
+
         public Simulation()
         {
+            currentSimulation = this;
             parseShapes("shapes.txt");
             currentRoundTime = 0;
+            //TODO: move to Display class
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             graphics.PreferredBackBufferWidth = 1024;
@@ -320,6 +331,16 @@ namespace Genome
             woundedHealthPercent = val;
         }
 
+        public static bool getFollowOnClick()
+        {
+            return followOnClick;
+        }
+
+        public static void setFollowOnClick(bool val)
+        {
+            followOnClick = val;
+        }
+
         #endregion
 
         #region game running logic
@@ -329,29 +350,65 @@ namespace Genome
             currentRoundTime++;
             if (currentRoundTime >= roundLengths)
             {
-                WorldState w = theWorld;
-                state = new JudgingState(w.getLiveCreatures(), w.getDeadCreatures());
+                judge();
             }
+        }
+
+        public static bool judgeIfAllDead()
+        {
+            return goToJudgeOnDeath;
+        }
+
+        public static void setJudgeIfAllDead(bool val)
+        {
+            goToJudgeOnDeath = val;
+        }
+
+        public static void judge()
+        {
+            WorldState w = theWorld;
+            state = new JudgingState(w.getLiveCreatures(), w.getDeadCreatures());
         }
 
         public static void judgingDone(List<Creature> creatureList)
         {
-            theWorld.reset();
-            theWorld.addCreatures(creatureList);
+            theWorld.reset(creatureList);
             state = theWorld;
+            currentRoundTime = 0;
             currentGeneration++;
         }
 
         public static void goToMenu()
         {
-            prevState = state;
             state = new MainMenuState();
         }
 
-        public static void exitMenu()
+        public static void options()
         {
-            state = prevState;
-            prevState = null;
+            state = new OptionsState();
+        }
+
+        public static void quit()
+        {
+            currentSimulation.Exit();
+        }
+
+        public static void restart()
+        {
+            state = new InitialisationState();
+            currentGeneration = 1;
+            currentRoundTime = 0;
+        }
+
+        public static void resume()
+        {
+            state = theWorld;
+        }
+
+        public static void begin(List<Creature> creatureList, Random r, int seed)
+        {
+            theWorld = new WorldState(r, seed, creatureList);
+            state = theWorld;
         }
 
         #endregion
@@ -361,13 +418,15 @@ namespace Genome
         protected override void Initialize()
         {
             base.Initialize();
+            //TODO: initialise Display here
             this.IsMouseVisible = true;
-            theWorld = new WorldState();
-            state = theWorld;
+            theWorld = null;
+            state = new InitialisationState();
         }
 
         protected override void LoadContent()
         {
+            //TODO: move all this stuff to Display
             spriteBatch = new SpriteBatch(GraphicsDevice);
             spriteFont = Content.Load<SpriteFont>("SpriteFont");
             //using a dictionary to set up the textures to allow us to store metadata about them in the form of an enum listing their names
@@ -382,7 +441,15 @@ namespace Genome
             texList.Add(TextureNames.MENU, "MenuButton");
             texList.Add(TextureNames.TOP, "TopMenu");
             texList.Add(TextureNames.CHANGEINFO, "ChangeInfo");
-
+            texList.Add(TextureNames.VIEWBACK, "ViewingBack");
+            texList.Add(TextureNames.PLANT_DEPLETED, "PlantDep");
+            texList.Add(TextureNames.MOREINFO, "MoreInfoBtn");
+            texList.Add(TextureNames.RESUME, "Resume");
+            texList.Add(TextureNames.RESTART, "Restart");
+            texList.Add(TextureNames.OPTIONSMENUBTN, "Options");
+            texList.Add(TextureNames.QUIT, "Quit");
+            texList.Add(TextureNames.EMPTYBTN, "BlankButton");
+            texList.Add(TextureNames.BACK, "BackButton");
             TextureNames[] texNames = texList.Keys.ToArray<TextureNames>();
 
             Dictionary<TextureNames, Texture2D>  textures = new Dictionary<TextureNames, Texture2D>();
@@ -411,6 +478,7 @@ namespace Genome
         protected override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
+            //TODO: call Display.draw to do the next 5 lines then call state.draw()
             GraphicsDevice device = graphics.GraphicsDevice;
             device.Clear(Color.White);
             GraphicsDevice.BlendState = BlendState.Opaque;
@@ -430,7 +498,108 @@ namespace Genome
 
         private void parseShapes(String fileLocation)
         {
-
+            try
+            {
+                StreamReader sr = new StreamReader(fileLocation);
+                string s = sr.ReadLine();
+                while (!s.Equals("### BEGIN ###")) //parser starts at ### BEGIN ###
+                {
+                    s = sr.ReadLine();
+                }
+                while (s != null)
+                {
+                    s = sr.ReadLine();
+                    string[] dims = s.Split('x'); //each shape begins with a description of its dimensions in the form AxB;
+                    int dimX = int.Parse(dims[0]);
+                    int dimY = int.Parse(dims[1]);
+                    s = sr.ReadLine();
+                    int[][] cells = new int[dimX][];
+                    List<ParamToken> pMods = new List<ParamToken>();
+                    List<ParamToken> nMods = new List<ParamToken>();
+                    for(int i = 0; i < dimY; i++)
+                    {
+                        cells[i] = new int[dimY];
+                        char[] c = s.ToCharArray();
+                        for(int j = 0; j < cells[i].Length; j++)
+                        {
+                            if(c[j].Equals('A')) //A stands for any value, represented by -1 in the shape text
+                            {
+                                cells[i][j] = -1;
+                            }
+                            else
+                            {
+                                cells[i][j] = (int)char.GetNumericValue(c[j]);
+                            }
+                        }
+                        s = sr.ReadLine();
+                    }
+                    s = sr.ReadLine();
+                    while(!s.Equals("###")) //param input ends at ###
+                    {
+                        char[] split = s.ToCharArray();
+                        char[] t = new char[] { split[0], split[1], split[2] };
+                        string ident = new string(t);
+                        
+                        ParamToken p = ParamToken.STRENGTH;
+                        if(ident.Equals("STR")) //first work out what parameter we're dealing with
+                        {
+                            p = ParamToken.STRENGTH;
+                        }
+                        else if (ident.Equals("SPD"))
+                        {
+                            p = ParamToken.SPEED;
+                        }
+                        else if (ident.Equals("AWA"))
+                        {
+                            p = ParamToken.AWARE;
+                        }
+                        else if (ident.Equals("DEF"))
+                        {
+                            p = ParamToken.DEFENCE;
+                        }
+                        else if (ident.Equals("ENG"))
+                        {
+                            p = ParamToken.ENERGY;
+                        }
+                        else if (ident.Equals("HTH"))
+                        {
+                            p = ParamToken.HEALTH;
+                        }
+                        else if(ident.Equals("STL"))
+                        {
+                            p = ParamToken.STEALTHVAL;
+                        }
+                        else
+                        {
+                            throw new Exception("Unrecognised parameter ident in shapes text");
+                        }
+                        for (int c = 3; c < split.Length; c++)
+                        {
+                            if(split[c].Equals('+'))
+                            {
+                                pMods.Add(p);
+                            }
+                            else if (split[c].Equals('-'))
+                            {
+                                nMods.Add(p);
+                            }
+                            else
+                            {
+                                throw new Exception("Non +/- character used as incrementor/decrementor in shapes text");
+                            }
+                        }
+                        s = sr.ReadLine();
+                    }
+                    Shape shape = new Shape(cells, pMods, nMods);
+                    recognisedShapes.Add(shape);
+                    s = sr.ReadLine();
+                }
+            }
+            catch(Exception e)
+            {
+                Console.Beep();
+                Console.WriteLine(e.Message);
+            }
         }
 
         #endregion

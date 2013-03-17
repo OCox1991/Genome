@@ -32,25 +32,52 @@ namespace Genome
         {
             get { return randomNumberGenerator; }
         }
-        private int seed = 0;
+        private int seed;
+        public int Seed
+        {
+            get { return seed; }
+        }
         private int creatureUpdated = 0;
+        private int numToUpdatePerTick = 10;
+
+        private long actSpeed = TimeSpan.TicksPerSecond/16;
+        private long timer;
         /// <summary>
-        /// Starts a new world with a random seed
+        /// Starts a new world with a random seed, 3 overloads to allow the specifying of a seed, a list of creatures or both
         /// </summary>
         public WorldState()
         {
             Random r = new Random();
-            seed = r.Next(100000);
+            seed = r.Next(1000000);
             randomNumberGenerator = new Random(seed);
             setUpWorld();
             addCreatures();
         }
 
-        public void reset()
+        public WorldState(List<Creature> creatures)
         {
-            foreach (Creature c in creatureList)
+            Random r = new Random();
+            seed = r.Next(1000000);
+            randomNumberGenerator = new Random(seed);
+            setUpWorld();
+            addCreatures(creatures);
+        }
+
+        public WorldState(Random r, int seed, List<Creature> creatures)
+        {
+            randomNumberGenerator = r;
+            this.seed = seed;
+            setUpWorld();
+            addCreatures(creatures);
+        }
+
+        public void reset(List<Creature> newCreatureList)
+        {
+            List<Creature> allCreatures = new List<Creature>();
+            allCreatures.AddRange(creatureList.ToArray<Creature>());
+            foreach (Creature c in allCreatures)
             {
-                c.userKillCreature();
+                killCreature(c);
             }
             foreach (Plant p in plantList)
             {
@@ -64,10 +91,12 @@ namespace Genome
             creatureList = new List<Creature>();
             deadList = new Stack<Creature>();
             remainsList = new List<Remains>();
+            addCreatures(newCreatureList);
         }
 
         public void setUpWorld()
         {
+            timer = 0;
             Vector2 TL = new Vector2(0, 150); //The top left of that area to actually draw the world in
             inputHandler = new WorldInputHandler(TL, new Vector2(1024 - TL.X, 768 - TL.Y), this);
             deadList = new Stack<Creature>();
@@ -145,7 +174,8 @@ namespace Genome
         /// <param name="creatures">The creatures to add to the world</param>
         public void addCreatures(List<Creature> creatures)
         {
-            creatureList = creatures;
+            creatureList = new List<Creature>();
+            creatureList.AddRange(creatures.ToArray<Creature>());
             placeCreatures();
         }
 
@@ -249,42 +279,33 @@ namespace Genome
                 {
                     for (int lookY = y - radius; lookY <= y + radius; lookY++)
                     {
-                        if (lookY < 0)
+                        if (!tileIsClear(lookY, lookX))
                         {
-                            lookY = 0;
-                        }
-                        else if (lookY > worldY)
-                        {
-                            lookY = y + radius + 1;
-                        }
-                        else
-                        {
-                            if (!tileIsClear(lookY, lookX))
+                            Tile t = getTile(lookY, lookX);
+                            if (t.creaturePresent())
                             {
-                                Tile t = getTile(lookY, lookX);
-                                if (t.creaturePresent())
+                                Creature c = t.getCreature();
+                                List<Creature> lc = (List<Creature>)a[0];
+                                lc.Add(c);
+                            }
+                            else if (t.plantPresent())
+                            {
+                                Plant p = t.getPlant();
+                                if (p.canBeEaten())
                                 {
-                                    Creature c = t.getCreature();
+                                    List<Plant> lp = (List<Plant>)a[1];
+                                    lp.Add(p);
                                 }
-                                else if (t.plantPresent())
-                                {
-                                    Plant p = t.getPlant();
-                                    if (p.canBeEaten())
-                                    {
-                                        List<Plant> lp = (List<Plant>)a[1];
-                                        lp.Add(p);
-                                    }
-                                }
-                                else if (t.remainsPresent())
-                                {
-                                    List<Remains> lr = (List<Remains>)a[2];
-                                    lr.Add(t.getRemains());
-                                }
-                                else if (t.obstaclePresent())
-                                {
-                                    List<Obstacle> lo = (List<Obstacle>)a[3];
-                                    lo.Add(t.getObstacle());
-                                }
+                            }
+                            else if (t.remainsPresent())
+                            {
+                                List<Remains> lr = (List<Remains>)a[2];
+                                lr.Add(t.getRemains());
+                            }
+                            else if (t.obstaclePresent())
+                            {
+                                List<Obstacle> lo = (List<Obstacle>)a[3];
+                                lo.Add(t.getObstacle());
                             }
                         }
                     }
@@ -326,9 +347,9 @@ namespace Genome
         /// <summary>
         /// Adds a creature at the specified location
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="c"></param>
+        /// <param name="x">The x index to add the creature at</param>
+        /// <param name="y">The y index to add the creature at</param>
+        /// <param name="c">The creature to add</param>
         public void addCreature(int x, int y, Creature c)
         {
             getTile(y, x).addCreature(c);
@@ -338,7 +359,7 @@ namespace Genome
         /// <summary>
         /// Adds a creature at a random clear location
         /// </summary>
-        /// <param name="c"></param>
+        /// <param name="c">The creature to add</param>
         public void addCreature(Creature c)
         {
             int[] clearTile = getRandomClearTile();
@@ -363,8 +384,18 @@ namespace Genome
         {
             if (creatureUpdated < creatureList.Count)
             {
-                creatureList[creatureUpdated].tick();
-                creatureUpdated++;
+                for (int i = 0; i < numToUpdatePerTick; i++)
+                {
+                    if (!(creatureUpdated < creatureList.Count))
+                    {
+                        i = numToUpdatePerTick + 1;
+                    }
+                    else
+                    {
+                        creatureList[creatureUpdated].tick();
+                        creatureUpdated++;
+                    }
+                }
             }
             else
             {
@@ -372,19 +403,29 @@ namespace Genome
                 {
                     p.tick();
                 }
+                List<Remains> removeList = new List<Remains>();
                 foreach (Remains r in remainsList)
                 {
                     r.tick();
                     if (r.fullyDecayed())
                     {
-                        int[] xy = r.getLocationXY();
-                        getTile(xy[1], xy[0]).clearTile();
-                        remainsList.Remove(r);
-                        r.setLocation(-1, -1);
+                        removeList.Add(r);
                     }
+                }
+                foreach (Remains r in removeList)
+                {
+                    int[] xy = r.getLocationXY();
+                    getTile(xy[1], xy[0]).clearTile();
+                    remainsList.Remove(r);
+                    r.setLocation(-1, -1);
                 }
                 creatureUpdated = 0;
                 Simulation.tick();
+            }
+            if (creatureList.Count == 0 && Simulation.judgeIfAllDead())
+            {
+                creatureUpdated = 0;
+                Simulation.judge();
             }
         }
 
@@ -394,6 +435,7 @@ namespace Genome
         /// <param name="c">The creature to kill</param>
         public void killCreature(Creature c)
         {
+
             int[] loc = c.getLocationXY();
             creatureList.Remove(c);
             getTile(loc[1], loc[0]).clearTile();
@@ -404,6 +446,9 @@ namespace Genome
             remainsList.Add(r);
             getTile(loc[1], loc[0]).addRemains(r);
             deadList.Push(c);
+#if DEBUG
+            Console.WriteLine("Remains added at: " + loc[0] + "," + loc[1]);
+#endif
         }
 
         /// <summary>
@@ -524,13 +569,24 @@ namespace Genome
 
         public override void update(GameTime gameTime)
         {
-            //TODO: add waiting stuff here. (Timer - gameTime) if Timer <= 0 then Timer = maxTimer - Timer and tick, so for ex speed 2 we divide the current val of timer by 2
             int speed = inputHandler.getSpeed();
-            for (int i = 0; i < speed; i++)
+            timer += gameTime.ElapsedGameTime.Ticks;
+            if (speed > 0 && timer > actSpeed / speed)
             {
-                tick(); //tick x times based on the speed specified by the simulation
+                if (gameTime.IsRunningSlowly)
+                {
+                    if (numToUpdatePerTick > 1)
+                    {
+                        numToUpdatePerTick /= 2;
+                    }
+                }
+                else
+                {
+                    numToUpdatePerTick++;
+                }
+                tick();
+                timer = 0;
             }
-            //TODO: End waiting stuff here, inputhandler should ALWAYS update
             inputHandler.update(gameTime);
         }
 

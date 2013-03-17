@@ -16,6 +16,7 @@ namespace Genome
         private static Dictionary<TextureNames, Texture2D> textures = new Dictionary<TextureNames, Texture2D>();
         private static SpriteFont spriteFont;
         private static SpriteBatch spriteBatch;
+        private static bool drawCreaturesAsGenes = false;
 
         private Display()
         {
@@ -27,8 +28,9 @@ namespace Genome
         /// </summary>
         /// <param name="dna"></param>
         /// <returns></returns>
-        public static Texture2D drawGenome(GraphicsDevice graphicsDevice, Gene dna)
+        public static Texture2D drawGenome(Gene dna)
         {
+            GraphicsDevice graphicsDevice = Simulation.getGraphicsDeviceManager().GraphicsDevice;
             Color[] colourMap = Simulation.getColours();
             Color[] geneColours = new Color[100];
 
@@ -38,7 +40,8 @@ namespace Genome
             {
                 for (int row = 0; row < 10; row++)
                 {
-                    geneColours[nextFree] = new Color(colourMap[dna.getColour(row, col) - 1].ToVector3());
+                    Color c = new Color(colourMap[dna.getColour(row, col)].ToVector3());
+                    geneColours[nextFree] = c;
 
                     nextFree++;
                 }
@@ -53,9 +56,9 @@ namespace Genome
         /// </summary>
         /// <param name="creature"></param>
         /// <returns></returns>
-        public static Texture2D drawGenome(GraphicsDevice graphicsDevice, Creature creature)
+        public static Texture2D drawGenome(Creature creature)
         {
-            return drawGenome(graphicsDevice, creature.getDna());
+            return drawGenome(creature.getDna());
         }
 
         /// <summary>
@@ -118,16 +121,51 @@ namespace Genome
 
         public static void drawButton(Button b)
         {
-            spriteBatch.Begin();
-            if (b.hovered())
+            if (b.isVisible())
             {
-                spriteBatch.Draw(b.getTexture(), new Rectangle((int)b.getLocation().X, (int)b.getLocation().Y, (int)b.getWidth(), (int)b.getHeight()), Color.Gray);
+                spriteBatch.Begin();
+                if (b.hovered())
+                {
+                    spriteBatch.Draw(b.getTexture(), new Rectangle((int)b.getLocation().X, (int)b.getLocation().Y, (int)b.getWidth(), (int)b.getHeight()), Color.Gray);
+                }
+                else
+                {
+                    spriteBatch.Draw(b.getTexture(), new Rectangle((int)b.getLocation().X, (int)b.getLocation().Y, (int)b.getWidth(), (int)b.getHeight()), Color.White);
+                }
+                spriteBatch.End();
             }
-            else
+        }
+
+        public static void drawButton(TextButton b)
+        {
+            if (b.isVisible())
             {
-                spriteBatch.Draw(b.getTexture(), new Rectangle((int)b.getLocation().X, (int)b.getLocation().Y, (int)b.getWidth(), (int)b.getHeight()), Color.White);
+                drawButton((Button)b);
+                spriteBatch.Begin();
+                Vector2 newLoc = new Vector2(b.getLocation().X + 5, b.getLocation().Y + 5);
+                spriteBatch.DrawString(spriteFont, b.Text, newLoc, Color.Black);
+                spriteBatch.End();
             }
-            spriteBatch.End();
+        }
+
+        public static int getWindowWidth()
+        {
+            return 1024;
+        }
+
+        public static int getWindowHeight()
+        {
+            return 768;
+        }
+
+        public static bool getDrawCreaturesAsGenes()
+        {
+            return drawCreaturesAsGenes;
+        }
+
+        public static void setDrawCreaturesAsGenes(bool val)
+        {
+            drawCreaturesAsGenes = val;
         }
     }
 }

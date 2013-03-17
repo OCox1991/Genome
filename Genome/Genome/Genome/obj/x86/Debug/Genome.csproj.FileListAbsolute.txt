@@ -18,3 +18,12 @@ C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Genome.
 C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Genome.pdb
 C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\obj\x86\Debug\Genome.exe
 C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\obj\x86\Debug\Genome.pdb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\ViewingBack.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\PlantDep.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\MoreInfoBtn.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\BlankButton.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Options.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Quit.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Restart.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Resume.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\BackButton.xnb

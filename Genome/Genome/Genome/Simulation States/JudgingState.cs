@@ -12,7 +12,7 @@ namespace Genome
     /// </summary>
     class JudgingState : SimulationState
     {
-        private JudgeDrawer drawer;
+        private SingleStringDrawer drawer;
 
         private bool isJudged;
         private bool isEliminated;
@@ -30,8 +30,14 @@ namespace Genome
         private int upperFix;
         private int total;
 
+        /// <summary>
+        /// Constructor for judging state, initialises all lists and checks to the correct values
+        /// </summary>
+        /// <param name="aliveCreatures">The list of alive creatures for rating</param>
+        /// <param name="deadCreatures">The list of dead creatures for rating in the form of a stack</param>
         public JudgingState(List<Creature> aliveCreatures, Stack<Creature> deadCreatures)
         {
+            drawer = new SingleStringDrawer(this);
             this.aliveCreatures = aliveCreatures;
             this.deadCreatures = deadCreatures;
             isJudged = false;
@@ -53,7 +59,11 @@ namespace Genome
             }
             else if (!isEliminated) //should run through once
             {
-                creatureList = aliveCreatures;
+                creatureList = new List<Creature>();
+                if (aliveCreatures.Count > 0)
+                {
+                    creatureList.AddRange(aliveCreatures.ToArray<Creature>());
+                }
                 //enclose this in an IF statement if you want to prevent dead creatures from being included
                 while(deadCreatures.Count > 0)
                 {
@@ -90,7 +100,7 @@ namespace Genome
                 }
                 else
                 {
-                    Random rand = new Random();
+                    Random rand = WorldState.RandomNumberGenerator;
                     if (creatureList.Count < (Simulation.getPopulation() / 100) * Simulation.getTopPercentage())
                     {
                         int c1 = rand.Next(top.Count);
@@ -164,15 +174,7 @@ namespace Genome
                 }
                 else
                 {
-                    Random r = new Random();
-                    if(r.Next(2) == 1)
-                    {
-                        ret = -1;
-                    }
-                    else
-                    {
-                        ret = 1;
-                    }
+                    ret = 0; //in this case they are equal
                 }
             }
             else //if c1stuff < c2stuff
@@ -180,6 +182,11 @@ namespace Genome
                 ret = -1;
             }
             return ret;
+        }
+
+        public override string ToString()
+        {
+            return status;
         }
 
         public override void draw()

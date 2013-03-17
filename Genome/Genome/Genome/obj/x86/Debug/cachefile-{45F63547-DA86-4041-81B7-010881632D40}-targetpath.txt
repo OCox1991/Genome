@@ -10,3 +10,12 @@ Content\minus.xnb
 Content\plus.xnb
 Content\TopMenu.xnb
 Content\SpriteFont.xnb
+Content\ViewingBack.xnb
+Content\PlantDep.xnb
+Content\MoreInfoBtn.xnb
+Content\BlankButton.xnb
+Content\Options.xnb
+Content\Quit.xnb
+Content\Restart.xnb
+Content\Resume.xnb
+Content\BackButton.xnb
