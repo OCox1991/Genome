@@ -112,7 +112,7 @@
     <Compile Include="Simulation States\Drawing Classes\MenuBranchDrawer.cs" />
     <Compile Include="Simulation States\Menu\Buttons\MainMenuButtons.cs" />
     <Compile Include="Simulation States\Menu\Buttons\OptionButton.cs" />
-    <Compile Include="Simulation States\Menu\MainMenuState.cs" />
+    <Compile Include="Simulation States\MainMenuState.cs" />
     <Compile Include="Simulation States\Menu\Menu.cs" />
     <Compile Include="Simulation States\Menu\MenuOptions\BoolLeafOption.cs" />
     <Compile Include="Simulation States\Menu\MenuOptions\BranchOption.cs" />
