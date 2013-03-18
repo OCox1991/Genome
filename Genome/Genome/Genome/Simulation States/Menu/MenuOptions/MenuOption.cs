@@ -23,6 +23,7 @@ namespace Genome
             this.text = text;
             this.menu = menu;
             button = new OptionButton(new Vector2(0,0), new Vector2(100, 35), TextureNames.EMPTYBTN, this);
+            button.Text = buttonText;
             Vector2 bLoc = new Vector2(location.X + Display.measureString(text).X + 5, location.Y);
             button.setLocation(bLoc, new Vector2(button.getWidth(), button.getHeight()));
         }
@@ -45,7 +46,7 @@ namespace Genome
         public void setLocation(Vector2 loc)
         {
             location = loc;
-            Vector2 bLoc = new Vector2(location.X + Display.measureString(text).X + 5, location.Y);
+            Vector2 bLoc = new Vector2(location.X + Display.measureString(text).X + 5, location.Y - (button.getHeight() / 2 - Display.measureString(text).Y / 2));
             button.setLocation(bLoc, new Vector2(button.getWidth(), button.getHeight()));
         }
 

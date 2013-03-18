@@ -64,6 +64,10 @@ namespace Genome
                     }
                 }
             }
+            if (prevState.IsKeyDown(Keys.Enter) && currentState.IsKeyUp(Keys.Enter))
+            {
+                clicked();
+            }
         }
 
         public string getInput()

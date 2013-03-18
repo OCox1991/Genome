@@ -22,13 +22,12 @@ namespace Genome
         /// <param name="text">The text to display this option as if it is in a list of menu options</param>
         /// <param name="description">The description of this option that is displayed at the top of the screen under the title if it is the selected option</param>
         /// <param name="menu">The menu object associated with this menu option</param>
-        public BranchOption(string text, string description, Menu menu) : base("select", text, description, menu)
+        public BranchOption(string text, string description, Menu menu) : base("Select", text, description, menu)
         {
             options = new List<MenuOption>();
             listTop = 0;
-            listDispLength = 5;
+            listDispLength = 12;
             drawer = new MenuBranchDrawer(this); //TODO: this
-            button.Text = "Select";
         }
 
         /// <summary>
@@ -45,7 +44,7 @@ namespace Genome
             List<MenuOption> returning;
             if (listDispLength < options.Count)
             {
-                returning = options.GetRange(listTop, listDispLength);
+                returning = options.GetRange(listTop, listDispLength); //TODO: work out odd bug with this code
             }
             else
             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace Genome
 {
@@ -12,6 +13,7 @@ namespace Genome
         protected Stack<MenuOption> prevOptions;
         protected MenuButton menuButton;
         protected BackButton backButton;
+        protected KeyboardState prevState;
 
         public Menu()
         {
@@ -20,6 +22,7 @@ namespace Genome
             menuButton = new MenuButton(new Vector2(0, 0));
             backButton = new BackButton(new Vector2(menuButton.getWidth() + 1, 0), this);
             backButton.setVisible(false);
+            prevState = new KeyboardState();
         }
 
         public void select(MenuOption o)
@@ -49,6 +52,12 @@ namespace Genome
 
         public override void update(GameTime gameTime)
         {
+            KeyboardState cState = Keyboard.GetState();
+            if (prevState.IsKeyDown(Keys.Escape) && cState.IsKeyUp(Keys.Escape))
+            {
+                menuButton.clicked();
+            }
+            prevState = cState;
             if (prevOptions.Count == 0)
             {
               backButton.setVisible(false);

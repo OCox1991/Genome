@@ -21,6 +21,6 @@ namespace Genome
             this.text = text;
         }
 
-        protected abstract override void clicked();
+        public abstract override void clicked();
     }
 }

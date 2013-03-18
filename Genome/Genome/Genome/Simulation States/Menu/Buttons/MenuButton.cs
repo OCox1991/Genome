@@ -17,7 +17,7 @@ namespace Genome
         {
         }
 
-        protected override void clicked()
+        public override void clicked()
         {
             Simulation.goToMenu();
         }

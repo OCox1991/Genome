@@ -15,7 +15,7 @@ namespace Genome
             associatedOption = option;
         }
 
-        protected override void clicked()
+        public override void clicked()
         {
             associatedOption.clicked();
         }

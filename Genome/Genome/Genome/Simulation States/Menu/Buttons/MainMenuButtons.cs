@@ -14,7 +14,7 @@ namespace Genome
 
         }
 
-        protected override void clicked()
+        public override void clicked()
         {
             Simulation.resume();
         }
@@ -28,7 +28,7 @@ namespace Genome
 
         }
 
-        protected override void clicked()
+        public override void clicked()
         {
             Simulation.restart();
         }
@@ -42,7 +42,7 @@ namespace Genome
 
         }
 
-        protected override void clicked()
+        public override void clicked()
         {
             Simulation.options();
         }
@@ -56,7 +56,7 @@ namespace Genome
 
         }
 
-        protected override void clicked()
+        public override void clicked()
         {
             Simulation.quit();
         }

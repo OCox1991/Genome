@@ -85,6 +85,6 @@ namespace Genome
             return topLeft;
         }
 
-        protected abstract void clicked();
+        public abstract void clicked();
     }
 }

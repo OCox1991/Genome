@@ -29,7 +29,7 @@ namespace Genome
         /// <summary>
         /// Tells the button what to do when clicked, goes back one screen on the menu
         /// </summary>
-        protected override void clicked()
+        public override void clicked()
         {
             menu.back();
         }

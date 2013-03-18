@@ -21,7 +21,7 @@ namespace Genome
             this.inputHandler = inputHandler;
         }
 
-        protected override void clicked()
+        public override void clicked()
         {
             inputHandler.slowDown();
         }
