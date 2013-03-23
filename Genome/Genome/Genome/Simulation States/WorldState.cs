@@ -364,6 +364,10 @@ namespace Genome
         {
             int[] clearTile = getRandomClearTile();
             addCreature(clearTile[0], clearTile[1], c);
+            if (!creatureList.Contains(c))
+            {
+                creatureList.Add(c);
+            }
         }
 
         /// <summary>

@@ -26,6 +26,8 @@ namespace Genome
         OPTIONSMENUBTN,
         QUIT,
         EMPTYBTN,
-        BACK
+        BACK,
+        KILL,
+        CLONE
     }
 }

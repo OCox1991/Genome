@@ -2,7 +2,7 @@
 //#define PATTERNTEST
 //#define POLLTEST
 //#define DIETTEST
-#define BREEDTEST
+//#define BREEDTEST
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -457,7 +457,6 @@ namespace Genome
             texList.Add(TextureNames.SLOWDOWN, "minus");
             texList.Add(TextureNames.MENU, "MenuButton");
             texList.Add(TextureNames.TOP, "TopMenu");
-            texList.Add(TextureNames.CHANGEINFO, "ChangeInfo");
             texList.Add(TextureNames.VIEWBACK, "ViewingBack");
             texList.Add(TextureNames.PLANT_DEPLETED, "PlantDep");
             texList.Add(TextureNames.MOREINFO, "MoreInfoBtn");
@@ -467,6 +466,8 @@ namespace Genome
             texList.Add(TextureNames.QUIT, "Quit");
             texList.Add(TextureNames.EMPTYBTN, "BlankButton");
             texList.Add(TextureNames.BACK, "BackButton");
+            texList.Add(TextureNames.KILL, "Kill");
+            texList.Add(TextureNames.CLONE, "Clone");
             TextureNames[] texNames = texList.Keys.ToArray<TextureNames>();
 
             Dictionary<TextureNames, Texture2D>  textures = new Dictionary<TextureNames, Texture2D>();

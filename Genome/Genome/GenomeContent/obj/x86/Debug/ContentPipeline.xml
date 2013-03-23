@@ -56,15 +56,6 @@
       <Time>2013-02-12T22:52:13.1507462+00:00</Time>
     </Item>
     <Item>
-      <Source>ChangeInfo.png</Source>
-      <Name>ChangeInfo</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\ChangeInfo.xnb</Output>
-      <Time>2013-03-05T21:53:13.649589+00:00</Time>
-    </Item>
-    <Item>
       <Source>MenuButton.png</Source>
       <Name>MenuButton</Name>
       <Importer>TextureImporter</Importer>
@@ -189,6 +180,24 @@
       <Options>None</Options>
       <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\BackButton.xnb</Output>
       <Time>2013-03-17T15:20:49.1793939+00:00</Time>
+    </Item>
+    <Item>
+      <Source>Clone.png</Source>
+      <Name>Clone</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Clone.xnb</Output>
+      <Time>2013-03-23T15:06:12.6323965+00:00</Time>
+    </Item>
+    <Item>
+      <Source>Kill.png</Source>
+      <Name>Kill</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Kill.xnb</Output>
+      <Time>2013-03-23T15:03:56.7446242+00:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

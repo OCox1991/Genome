@@ -1529,6 +1529,7 @@ namespace Genome
         public Creature userCloneCreature()
         {
             Creature c = new Creature(this.getDna());
+            c.setWorld(this.world);
             world.addCreature(c);
             return c;
         }
@@ -1538,7 +1539,7 @@ namespace Genome
         /// </summary>
         public void userKillCreature()
         {
-            this.die();
+            damage(this.getHealth());
         }
 
         #endregion

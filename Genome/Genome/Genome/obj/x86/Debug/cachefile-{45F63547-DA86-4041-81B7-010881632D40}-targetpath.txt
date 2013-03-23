@@ -4,7 +4,6 @@ Content\GameThumbnail.xnb
 Content\Obstacle.xnb
 Content\Plant.xnb
 Content\Remains.xnb
-Content\ChangeInfo.xnb
 Content\MenuButton.xnb
 Content\minus.xnb
 Content\plus.xnb
@@ -19,4 +18,6 @@ Content\Quit.xnb
 Content\Restart.xnb
 Content\Resume.xnb
 Content\BackButton.xnb
+Content\Clone.xnb
+Content\Kill.xnb
 Content\Shapes.txt

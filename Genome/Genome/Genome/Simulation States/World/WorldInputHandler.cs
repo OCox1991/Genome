@@ -28,11 +28,12 @@ namespace Genome
         private List<Button> buttons; //the buttons present on the world view
         private WorldState world; //the world we are viewing
         private bool viewing; //if we are viewing a specific creature/plant/remains
-        private bool following;
+        private bool following; //if we are following something
         private Creature creatureView; //the creature being viewed
         private Remains remainsView; //the remains being viewed
         private Plant plantView; //the plant being viewed
-        private WorldDrawer drawer;
+        private WorldDrawer drawer; //the drawing class for the world
+        private bool start; //the start 
         private int dataViewed;
         public int DataViewed
         {
@@ -57,12 +58,33 @@ namespace Genome
             buttons.Add(new SlowDownButton(new Vector2(Display.measureString("Speed:        ").X, 55), this));
             buttons.Add(new SpeedUpButton(new Vector2(Display.measureString("Speed:        x00 ").X + 35 + 5, 55), this));
             buttons.Add(new ViewMoreInfoButton(new Vector2(Display.getWindowWidth() - (110 + ((Display.getWindowWidth() - 800) / 2)), Display.getWindowHeight() - 130), this));
+            buttons.Add(new KillButton(this, new Vector2(Display.getWindowWidth() - (110 + ((Display.getWindowWidth() - 800) / 2)) - buttons[3].getWidth() - 5, Display.getWindowHeight() - 130)));
+            buttons.Add(new CloneButton(this, new Vector2(Display.getWindowWidth() - (110 + ((Display.getWindowWidth() - 800) / 2)) - buttons[3].getWidth() - 5 - buttons[4].getWidth() - 5, Display.getWindowHeight() - 130)));
             drawer = new WorldDrawer(this);
             buttons[3].setVisible(false);
+            buttons[4].setVisible(false);
+            buttons[5].setVisible(false);
+            start = false;
         }
 
         public void update(GameTime gameTime)
         {
+            if(Simulation.getNumTicks() == 0)
+            {
+                if (start) //check if we have already done this
+                {
+                    start = false;
+                    deView();
+                }
+            }
+            else if (Simulation.getNumTicks() == 1)
+            {
+                start = true; //reset the start flag here
+            }
+            for (int i = 0; i < buttons.Count; i++)
+            {
+                buttons[i].update(gameTime);
+            }
             if (viewingACreature())
             {
                 if (creatureView.getHealth() <= 0)
@@ -72,10 +94,6 @@ namespace Genome
             }
             prevState = currentState;
             currentState = Mouse.GetState();
-            for (int i = 0; i < buttons.Count; i++)
-            {
-                buttons[i].update(gameTime);
-            }
             KeyboardState k = Keyboard.GetState();
             if (k.IsKeyDown(Keys.Escape))
             {
@@ -376,10 +394,12 @@ namespace Genome
             }
         }
 
-        private void viewCreature(Creature c)
+        public void viewCreature(Creature c)
         {
             viewing = true;
             maxInfo = creatureMaxInfo;
+            buttons[4].setVisible(true);
+            buttons[5].setVisible(true);
             creatureView = c;
         }
 
@@ -405,6 +425,8 @@ namespace Genome
             following = false;
             dataViewed = 0;
             buttons[3].setVisible(false);
+            buttons[4].setVisible(false);
+            buttons[5].setVisible(false);
         }
 
         public Creature getCreature()

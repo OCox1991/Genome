@@ -256,26 +256,29 @@ namespace Genome
         public int poll(int row, int col)
         {
             int maxColour = -1;
-            if (row < 1 || row > cells.Length || col < 1 || col > cells[row].Length) //if we are in the first or last row or column
+            Queue<int> coloursInOrderOfAppearance = new Queue<int>();
+            if (row < 1 || row > cells.Length - 1 || col < 1 || col > cells[row].Length - 1) //if we are in the first or last row or column
             {
                 //do nothing, maxColour will be returned to give the value -1;
             }
             else
             {
                 int[] results = new int[7];
-                for (int i = -1; i < 2; i++) //this loop produces an array where the number of each colour is mapped to the number of times it occurs
+                for (int i = -1; i <= 1; i++) //this loop produces an array where the number of each colour is mapped to the number of times it occurs
                 {
                     for (int j = -1; j < 2; j++) //look at 0, 1, 2 (-1, 0, 1)
                     {
                         int lookupRow = row + i;
                         int lookupCol = col + j;
-                        results[getColour(lookupRow, lookupCol)]++;
+                        int colour = getColour(lookupRow, lookupCol);
+                        results[colour]++;
+                        coloursInOrderOfAppearance.Enqueue(colour);
                     }
                 }
                 
                 int maxVal = 0; //the maximum value found so far
-                Boolean[] tieColours = new Boolean[7]; //used to keep track of what colours are part of the tie
-                Boolean tie = true; //used to keep track of if a tie is occuring
+                bool[] tieColours = new Boolean[7]; //used to keep track of what colours are part of the tie
+                bool tie = true; //used to keep track of if a tie is occuring
                 for (int i = 0; i < results.Length; i++)//finding the max occurences in the results ie. max(results)
                 {
                     if (results[i] > maxVal || maxColour == -1) //if a better max has been found OR no max colour currently exists
@@ -301,26 +304,16 @@ namespace Genome
                 }
                 //on loop end: maxVal > 0, if tie == false all elements of tieColours are also false
 
-                //code to deal with ties
-                int k = 0;
-                int l = 0;
-                while(tie && k < 3)
+                //code to deal with ties, uses the queue set up earlier
+
+                while (tie)
                 {
-                    while(tie && l < 3)
+                    int nextCol = coloursInOrderOfAppearance.Dequeue();
+                    if (tieColours[nextCol])
                     {
-                        int lookupRow = row + (k - 1);
-                        int lookupCol = col + (l - 1);
-                        int colour = getColour(lookupRow, lookupCol);
-
-                        if (tieColours[colour]) //then we've found the topmost leftmost colour out of all the tied colours
-                        {
-                            maxColour = colour;
-                            tie = false;
-                        }
-
-                        k++; //otherwise look at the next cell
+                        tie = false;
+                        maxColour = nextCol;
                     }
-                    l++;
                 }
             }
             return maxColour;
