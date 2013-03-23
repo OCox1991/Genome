@@ -39,7 +39,7 @@ namespace Genome
             get { return dataViewed; }
         }
         private int maxInfo;
-        private static int creatureMaxInfo = 2;
+        private static int creatureMaxInfo = 4;
         private static int plantMaxInfo = 1;
         private static int remainsMaxInfo = 1;
 
@@ -432,9 +432,27 @@ namespace Genome
             string[] status = new string[1];
             switch (DataViewed)
             {
-                case 0: status = new string[] { "Health: " + c.getHealth(), "Energy :" + c.getEnergy(), "Current Scenario: " + c.CurrentScenario, "Response: " + c.CurrentResponse }; break;
+                case 0: status = new string[] { "Health: " + c.getHealth(), "Energy :" + c.getEnergy(), "Current Scenario: " + c.CurrentScenario, "Response: " + c.CurrentResponse, "Stamina: " + c.getStamina() + "/" + c.getMaxStamina(), "Location: (" + c.getLocationXY()[0] + "," + c.getLocationXY()[1] + ")" }; break;
                 case 1: int[] colours = c.getDna().getColourCount();
                     status = new string[] { "Number of...", "0s: " + colours[0], "1s: " + colours[1], "2s: " + colours[2], "3s: " + colours[3], "4s: " + colours[4], "5s: " + colours[5], "6s: " + colours[6] };
+                    break;
+                case 2: Color[] cols = Simulation.getColours();
+                    status = new string[cols.Length];
+                    for (int i = 0; i < cols.Length; i++ )
+                    {
+                        status[i] = i + ": " + cols[i].ToString();
+                    }
+                    break;
+                case 3: string dietString = "Diet: " + c.getDiet();
+                    if (c.getDiet() < 0.5)
+                    {
+                        dietString += " (HERBIVORE)";
+                    }
+                    else
+                    {
+                        dietString += " (CARNIVORE)";
+                    }
+                    status = new string[] { "Stats:", "STR: " + c.getStrength(), "SPD: " + c.getSpeed(), "STL: " + c.getStealthVal(), "AWA: " + c.getAwareness(), "DEF: " + c.getDefence(), dietString };
                     break;
             }
             return status;

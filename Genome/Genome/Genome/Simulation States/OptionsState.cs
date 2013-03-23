@@ -39,8 +39,9 @@ namespace Genome
             creatureOption.addOption(new IntLeafOption("Health regen percent per tick", "The percentage of health that is regenerated per turn", this, Simulation.getHealthRegenSpeed, Simulation.setHealthRegenSpeed, 100, 1));
             initialState.addOption(creatureOption);
 
-            BranchOption judgingOption = new BranchOption("Judging options", "Options related to how the creatures are judged by the program", this);
+            BranchOption judgingOption = new BranchOption("Judging & breeding options", "Options related to how the creatures are judged by the program and breeding them together", this);
             //TODO: add ignore dead creatures bool
+            judgingOption.addOption(new IntLeafOption("Mutation chance", "The chance of mutation, P(mutation) = 1/[This value]", this, Simulation.getMutationChance, Simulation.setMutationChance));
             judgingOption.addOption(new IntLeafOption("Energy weight", "How heavily the judging state values energy in creatures", this, Simulation.getEnergyWeight, Simulation.setEnergyWeight));
             judgingOption.addOption(new IntLeafOption("Health weight", "How heavily the judging state values health in creatures", this, Simulation.getHealthWeight, Simulation.setHealthWeight));
             judgingOption.addOption(new IntLeafOption("Top percentage", "What percentage of the creatures is considered high performing and thus has its children make up 50% of the next generation", this, Simulation.getTopPercentage, Simulation.setTopPercentage, 99, 1));

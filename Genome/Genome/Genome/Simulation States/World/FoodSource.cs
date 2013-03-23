@@ -34,10 +34,7 @@ namespace Genome
         /// to return true
         /// </summary>
         /// <returns>False except in the Plant subclass</returns>
-        public bool isPlant()
-        {
-            return false;
-        }
+        public abstract bool isPlant();
 
         /// <summary>
         /// Gets the value of the food, this will be different for each subclass

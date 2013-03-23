@@ -30,15 +30,16 @@ namespace Genome
         /// <returns></returns>
         public static Texture2D drawGenome(Gene dna)
         {
-            GraphicsDevice graphicsDevice = Simulation.getGraphicsDeviceManager().GraphicsDevice;
+            GraphicsDeviceManager gdm = Simulation.getGraphicsDeviceManager();
+            GraphicsDevice graphicsDevice = gdm.GraphicsDevice;
             Color[] colourMap = Simulation.getColours();
-            Color[] geneColours = new Color[100];
+            Color[] geneColours = new Color[dna.getSizeX() * dna.getSizeY()];
 
-            Texture2D tex = new Texture2D(graphicsDevice, 10, 10);
+            Texture2D tex = new Texture2D(graphicsDevice, dna.getSizeX(), dna.getSizeY());
             int nextFree = 0;
-            for(int col = 0; col < 10; col++)
+            for(int col = 0; col < dna.getSizeY(); col++)
             {
-                for (int row = 0; row < 10; row++)
+                for (int row = 0; row < dna.getSizeX(); row++)
                 {
                     Color c = new Color(colourMap[dna.getColour(row, col)].ToVector3());
                     geneColours[nextFree] = c;

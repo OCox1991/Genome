@@ -27,7 +27,7 @@ namespace Genome
             options = new List<MenuOption>();
             listTop = 0;
             listDispLength = 12;
-            drawer = new MenuBranchDrawer(this); //TODO: this
+            drawer = new MenuBranchDrawer(this);
         }
 
         /// <summary>

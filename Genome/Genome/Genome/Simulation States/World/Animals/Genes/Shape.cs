@@ -25,8 +25,10 @@ namespace Genome
         {
             this.posMods = posMods;
             this.negMods = negMods;
+            this.cells = new Cell[cells.Length][];
             for(int i = 0; i < cells.Length; i++)
             {
+                this.cells[i] = new Cell[cells[i].Length];
                 for (int j = 0; j < cells.Length; j++)
                 {
                     int c = cells[i][j];

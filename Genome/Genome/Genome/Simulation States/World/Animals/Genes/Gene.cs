@@ -15,6 +15,7 @@ namespace Genome
         private int[] colourCount;
         private const int cellsX = 10;
         private const int cellsY = 10;
+        private static Random random;
         private Texture2D texture;
 
         /// <summary>
@@ -22,13 +23,15 @@ namespace Genome
         /// </summary>
         public Gene()
         {
-            generateCells(WorldState.RandomNumberGenerator);
+            random = WorldState.RandomNumberGenerator;
+            generateCells();
             this.init();
         }
 
         public Gene(Random rand)
         {
-            generateCells(rand);
+            random = rand;
+            generateCells();
             this.init();
         }
 
@@ -42,7 +45,19 @@ namespace Genome
             this.init();
         }
 
-        private void generateCells(Random rand)
+        /// <summary>
+        /// An overloaded constructor to allow the specification of both the random number generator and the list of cells
+        /// </summary>
+        /// <param name="cells">The cells to use</param>
+        /// <param name="rand">The random number generator</param>
+        public Gene(Cell[][] cells, Random rand)
+        {
+            random = rand;
+            this.cells = cells;
+            this.init();
+        }
+
+        private void generateCells()
         {
             cells = new Cell[cellsX][]; //Using jagged arrays here to improve extensibility
             for (int i = 0; i < cells.Length; i++)
@@ -50,7 +65,7 @@ namespace Genome
                 cells[i] = new Cell[cellsY];
                 for (int j = 0; j < cells[i].Length; j++)
                 {
-                    int c = rand.Next(7);
+                    int c = random.Next(7);
                     cells[i][j] = new Cell(c, c);
                 }
             }
@@ -102,9 +117,17 @@ namespace Genome
                 newCells[i] = new Cell[10];
                 for (int j = 0; j < cells.Length; j++)
                 {
-                    int colour1 = this.getPart(i,j);
-                    int colour2 = otherGene.getPart(i,j);
-                    newCells[i][j] = new Cell(colour1, colour2);
+                    int mutationChance = Simulation.getMutationChance();
+                    if (random.Next(mutationChance) == 1)
+                    {
+                        newCells[i][j] = new Cell(random.Next(7), random.Next(7));
+                    }
+                    else
+                    {
+                        int colour1 = this.getPart(i, j);
+                        int colour2 = otherGene.getPart(i, j);
+                        newCells[i][j] = new Cell(colour1, colour2);
+                    }
                 }
             }
             return new Gene(newCells);
@@ -160,12 +183,11 @@ namespace Genome
         /// <param name="s">The shape to match across the whole genome</param>
         private void patternMatch(Shape s)
         {
-            for(int row = 0; row < cells.Length - (s.sizeRow() - 1); row++)
+            for (int i = 0; i <= cells.Length - s.sizeRow(); i++)
             {
-                for (int col = 0; col < cells.Length - (s.sizeCol() - 1); col++)
+                for (int j = 0; j <= cells[i].Length - s.sizeCol(); j++)
                 {
-                    //add some check with Shape size here
-                    if (cellMatch(s, row, col))
+                    if (cellMatch(s, i, j))
                     {
                         posMods.AddRange(s.getPosMods());
                         negMods.AddRange(s.getNegMods());
@@ -182,29 +204,45 @@ namespace Genome
         /// <param name="row">The row of the top left cell to look at</param>
         /// <param name="col">The column of the top left cell to look at</param>
         /// <returns>True if all cells match the given colours of the shape and false otherwise. The colour -1 is used to represent a wildcard</returns>
-        private Boolean cellMatch(Shape s, int row, int col)
+        private bool cellMatch(Shape s, int row, int col)
         {
-            Boolean isMatch = true;
-            if (row > cells.Length - 2 || col > cells.Length - 2) //if we have gone far enough along that the matching would go off the edge
+            Cell[][] checkCells = new Cell[s.sizeRow()][];
+            for (int i = 0; i < s.sizeRow(); i++)
             {
-                isMatch = false;
-            }
-
-            int i = 0;
-            int j = 0;
-            while(i < 3 && isMatch == true) //using while loops here to allow early termination if it doesn't match
-            {
-                while(j < 3 && isMatch == true)
+                checkCells[i] = new Cell[s.sizeCol()];
+                for (int j = 0; j < s.sizeCol(); j++)
                 {
-                    if (s.getColour(i,j) != getColour(i,j) && s.getColour(i,j) != -1)
-                    {
-                        isMatch = false;
-                    }
-                    j++;
+                    checkCells[i][j] = cells[i + row][j + col];
                 }
-                i++;
             }
-            return isMatch;
+            bool isMatch = true;
+            int sizeCol = s.sizeCol();
+            int sizeRow = s.sizeRow();
+
+            for (int compCol = 0; compCol < sizeCol; compCol++)
+            {
+                for (int compRow = 0; compRow < sizeRow; compRow++)
+                {
+                    if(s.getColour(compRow, compCol) == -1)
+                    {
+                        //do nothing, -1 represents the wildcard
+                    }
+                    else if(s.getColour(compRow, compCol) == checkCells[compRow][compCol].getDomColour())
+                    {
+                        //do nothing, the cells match
+                    }
+                    else
+                    {
+                        isMatch = false; //Otherwise they don't match so the shape doesn't match at this location
+                    }
+                }
+            }
+#if DEBUG
+            if (isMatch)
+            {
+            }
+#endif
+            return isMatch;            
         }
 
         /// <summary>
@@ -225,12 +263,12 @@ namespace Genome
             else
             {
                 int[] results = new int[7];
-                for (int i = 0; i < 2; i++) //this loop produces an array where the number of each colour is mapped to the number of times it occurs
+                for (int i = -1; i < 2; i++) //this loop produces an array where the number of each colour is mapped to the number of times it occurs
                 {
-                    for (int j = 0; j < 2; j++) //look at 0, 1, 2 (-1, 0, 1)
+                    for (int j = -1; j < 2; j++) //look at 0, 1, 2 (-1, 0, 1)
                     {
-                        int lookupRow = row + (i-1);
-                        int lookupCol = col + (j-1);
+                        int lookupRow = row + i;
+                        int lookupCol = col + j;
                         results[getColour(lookupRow, lookupCol)]++;
                     }
                 }

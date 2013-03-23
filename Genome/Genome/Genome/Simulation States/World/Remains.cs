@@ -26,6 +26,11 @@ namespace Genome
             actTimer = Simulation.getNumTicksToDecayRemains();
         }
 
+        public override bool isPlant()
+        {
+            return false;
+        }
+
         public override void act()
         {
             foodRemaining--;

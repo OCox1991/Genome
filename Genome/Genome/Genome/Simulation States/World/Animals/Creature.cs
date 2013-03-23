@@ -203,11 +203,13 @@ namespace Genome
             int[] colourCount = dna.getColourCount();
             for (i = 0; i < 3; i++)
             {
-                diet += (int)(float)colourCount[i] * 0.005; //0.005 since max of 1 colour is 100 and default diet == 0.5 so 100 * 0.005 + 0.5 = 1 AKA the max/min value of the diet
+                double dietMod = (double)colourCount[i] * 0.005; //0.005 since max of 1 colour is 100 and default diet == 0.5 so 100 * 0.005 + 0.5 = 1 AKA the max/min value of the diet
+                diet += dietMod; 
             }
-            for (i = 4; i < 4; i++)
+            for (i = 4; i < 7; i++)
             {
-                diet -= (int)(float)colourCount[i] * 0.005; //0.005 since max of 1 colour is 100 and default diet == 0.5 so 100 * 0.005 + 0.5 = 1 AKA the max/min value of the diet
+                double dietMod = (double)colourCount[i] * 0.005; //0.005 since max of 1 colour is 100 and default diet == 0.5 so 100 * 0.005 + 0.5 = 1 AKA the max/min value of the diet
+                diet -= dietMod; 
             }
             i = 3;
             if (diet > 0.5)
@@ -221,7 +223,7 @@ namespace Genome
             else if (diet < 0.5)
             {
                 diet += (int)(float)colourCount[i] * 0.005;
-                if (diet < 0.5)
+                if (diet > 0.5)
                 {
                     diet = 0.5;
                 }
@@ -239,6 +241,24 @@ namespace Genome
             return dna;
         }
 
+        /// <summary>
+        /// Gets the current stamina value of the creature
+        /// </summary>
+        /// <returns>The current stamina value of the creature</returns>
+        public int getStamina()
+        {
+            return stamina;
+        }
+
+        /// <summary>
+        /// Gets the maximum possible stamina the creature can have
+        /// </summary>
+        /// <returns>The maximum stamina the creature can have</returns>
+        public int getMaxStamina()
+        {
+            return maxStamina;
+        }
+        
         /// <summary>
         /// Gets the defence value of this creature
         /// </summary>
@@ -309,6 +329,15 @@ namespace Genome
         public int getEnergy()
         {
             return energy;
+        }
+
+        /// <summary>
+        /// Returns the diet value of the creature
+        /// </summary>
+        /// <returns>The diet value of the creature</returns>
+        public double getDiet()
+        {
+            return diet;
         }
 
         /// <summary>
@@ -755,17 +784,36 @@ namespace Genome
         /// <returns>The energy the creature would get if it ate the foodsource</returns>
         private int getNourishmentAmt(FoodSource f)
         {
-            int ret = 0;
+            double ret = 0;
             if (f.isPlant())
             {
-                ret = (int)(f.getFoodValue() * (1 - diet));
+                double inverseDiet = 1 - diet;
+                ret = f.getFoodValue() * inverseDiet;
             }
             else
             {
-                ret = (int)(f.getFoodValue() * diet);
+                ret = f.getFoodValue() * diet;
             }
-            return ret;
+            return (int)ret;
         }
+
+#if DEBUG
+        /// <summary>
+        /// A public way to access getMostNourishing, used in debugging and testing
+        /// </summary>
+        public FoodSource pubGetMostNourishing(List<FoodSource> f)
+        {
+            return getMostNourishing(f);
+        }
+
+        /// <summary>
+        /// A public way to access getNourishmentAmt, used in debugging and testing
+        /// </summary>
+        public int pubGetNourishmentAmt(FoodSource f)
+        {
+            return getNourishmentAmt(f);
+        }
+#endif
 
         /// <summary>
         /// Gets the FoodSource with the most remaining in a given list
@@ -924,7 +972,7 @@ namespace Genome
         /// <returns>A bool representing if the creature can act or not</returns>
         public bool canAct(int energyCost)
         {
-            return energyCost <= stamina && energyCost <= energy + health/2; //TODO: remove the health check from this
+            return energyCost <= stamina && energyCost <= energy;
         }
 
         /// <summary>
@@ -1029,7 +1077,9 @@ namespace Genome
                     {
                         f.beEaten();
                         energy += getNourishmentAmt(f);
-                        stamina /= (100 / 75); //div 75 could be settable by Simulation 
+                        float ts = (float)stamina; //convert to float here to avoid minimise rounding errors
+                        ts /= (100 / 50); //div 50 could be settable by Simulation (100 / x) where x == %age of stamina to drain
+                        stamina = (int)ts;
                     }
                     else
                     {
@@ -1256,7 +1306,7 @@ namespace Genome
                     if (danger < bestSoFar)
                     {
                         bestSoFar = danger;
-                        bestDirSoFar = dir; //TODO: look closely at this whole method
+                        bestDirSoFar = dir;
                     }
                 }
             }
@@ -1495,6 +1545,11 @@ namespace Genome
         #endregion
         #endregion
 
-
+#if DEBUG
+        public Dictionary<Scenario, Response> getBehaviour()
+        {
+            return behaviour;
+        }
+#endif
     }
 }

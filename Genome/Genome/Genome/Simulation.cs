@@ -1,4 +1,9 @@
-﻿using System;
+﻿//#define CELLTEST
+//#define PATTERNTEST
+//#define POLLTEST
+//#define DIETTEST
+#define BREEDTEST
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -27,7 +32,7 @@ namespace Genome
         private static int numFoodUnitsPlant = 3; //flat
         private static int numFoodUnitsRemains = 4; //flat
 
-        private static int population = 1; //flat
+        private static int population = 100; //flat
         private static int plantPop = 10000; //flat
         private static int obstacleNumber = 25000; //flat
 
@@ -44,6 +49,8 @@ namespace Genome
         private static int energyDrainPerTick = 5; //flat
         private static int staminaRejuvenationPercent = 1; //%age
         private static int healthRejuvenationPercent = 1; //%age
+
+        private static int mutationChance = 100; // 1:x chance
 
         //Round rules
         private static int roundLengths = 10000; //flat
@@ -68,7 +75,7 @@ namespace Genome
         public Simulation()
         {
             currentSimulation = this;
-            parseShapes("shapes.txt");
+            parseShapes("Content/Shapes.txt");
             currentRoundTime = 0;
             //TODO: move to Display class
             graphics = new GraphicsDeviceManager(this);
@@ -199,6 +206,16 @@ namespace Genome
         public static void setEnergyWeight(int val)
         {
             energyWeight = val;
+        }
+
+        public static int getMutationChance()
+        {
+            return mutationChance;
+        }
+
+        public static void setMutationChance(int val)
+        {
+            mutationChance = val;
         }
 
         public static int getHealthWeight()
@@ -468,6 +485,156 @@ namespace Genome
 
         protected override void Update(GameTime gameTime)
         {
+            #region testing
+#if CELLTEST
+            int[][] colours = new int[6][];
+            colours[0] = new int[] { 0, 0 }; //Check the same
+            colours[1] = new int[] { 7, 7 }; //Check the same
+            colours[2] = new int[] { 1, 3 }; //Check different
+            colours[3] = new int[] { 3, 1 }; //Check different but the other way around
+            colours[4] = new int[] { 7, 1 }; //Check different and wrapping 
+            colours[5] = new int[] { 1, 7 }; //Check different and wrapping but the other way around
+            foreach(int[] i in colours)
+            {
+                Cell c = new Cell(i[0], i[1]);
+                Console.WriteLine("C1: " + i[0] + " C2: " + i[1] + " DOM: " + c.getDomColour());
+            }
+            Environment.Exit(0);
+#endif
+#if PATTERNTEST
+            //Code for checking various things
+            Cell[][] c = new Cell[3][];
+            c[0] = new Cell[] { new Cell(1, 1), new Cell(0, 0), new Cell(0, 0) };
+            c[1] = new Cell[] { new Cell(0, 0), new Cell(1, 1), new Cell(0, 0) };
+            c[2] = new Cell[] { new Cell(0, 0), new Cell(0, 0), new Cell(1, 1) };
+            geneTest(new Gene(c));
+
+            c[0] = new Cell[] { new Cell(1, 1), new Cell(0, 0), new Cell(0, 0) };
+            c[1] = new Cell[] { new Cell(0, 0), new Cell(1, 1), new Cell(0, 0) };
+            c[2] = new Cell[] { new Cell(0, 0), new Cell(0, 0), new Cell(0, 0) };
+            geneTest(new Gene(c));
+
+            c[0] = new Cell[] { new Cell(0, 0), new Cell(0, 0), new Cell(1, 1) };
+            c[1] = new Cell[] { new Cell(0, 0), new Cell(1, 1), new Cell(0, 0) };
+            c[2] = new Cell[] { new Cell(1, 1), new Cell(0, 0), new Cell(0, 0) };
+            geneTest(new Gene(c));
+
+            c[0] = new Cell[] { new Cell(1, 1), new Cell(0, 0), new Cell(1, 1) };
+            c[1] = new Cell[] { new Cell(0, 0), new Cell(1, 1), new Cell(0, 0) };
+            c[2] = new Cell[] { new Cell(1, 1), new Cell(0, 0), new Cell(1, 1) };
+            geneTest(new Gene(c));
+
+            c[0] = new Cell[] { new Cell(0, 0), new Cell(6, 6), new Cell(1, 1), new Cell(1, 1) };
+            c[1] = new Cell[] { new Cell(1, 1), new Cell(0, 0), new Cell(6, 6), new Cell(1, 1) };
+            c[2] = new Cell[] { new Cell(1, 1), new Cell(1, 1), new Cell(0, 0), new Cell(6, 6) };
+            geneTest(new Gene(c));
+
+            c[0] = new Cell[] { new Cell(0, 0), new Cell(0, 0), new Cell(0, 0) };
+            c[1] = new Cell[] { new Cell(0, 0), new Cell(0, 0), new Cell(0, 0) };
+            c[2] = new Cell[] { new Cell(0, 0), new Cell(0, 0), new Cell(1, 1) };
+
+            Cell[][] rCells = new Cell[1][];
+            rCells[0] = new Cell[] { new Cell(1, 1) };
+            List<ParamToken> rMods = new List<ParamToken>();
+            rMods.Add(ParamToken.STRENGTH);
+            recognisedShapes = new List<Shape>();
+            recognisedShapes.Add(new Shape(rCells, rMods, new List<ParamToken>()));
+
+            geneTest(new Gene(c));
+
+            Environment.Exit(0);
+#endif
+#if POLLTEST
+            Cell[][] newGene = new Cell[10][];
+            for (int colour = 0; colour < 7; colour++)
+            {
+                for (int i = 0; i < newGene.Length; i++)
+                {
+                    newGene[i] = new Cell[10];
+                    for (int j = 0; j < newGene[i].Length; j++)
+                    {
+                        newGene[i][j] = new Cell(colour, colour);
+                    }
+                }
+                creatureTest(newGene);
+            }
+
+
+            for (int i = 0; i < newGene.Length; i++)
+            {
+                newGene[i] = new Cell[10];
+                for (int j = 0; j < newGene[i].Length; j++)
+                {
+                    newGene[i][j] = new Cell(0, 0);
+                }
+            }
+            newGene[0][0] = new Cell(0, 0); newGene[0][1] = new Cell(0, 0); newGene[0][2] = new Cell(0, 0);
+            newGene[1][0] = new Cell(0, 0); newGene[1][1] = new Cell(0, 0); newGene[1][2] = new Cell(0, 0);
+            newGene[2][0] = new Cell(0, 0); newGene[2][1] = new Cell(0, 0); newGene[2][2] = new Cell(1, 1);
+            creatureTest(newGene);
+
+            newGene[0][0] = new Cell(0, 0); newGene[0][1] = new Cell(0, 0); newGene[0][2] = new Cell(0, 0);
+            newGene[1][0] = new Cell(0, 0); newGene[1][1] = new Cell(2, 2); newGene[1][2] = new Cell(1, 1);
+            newGene[2][0] = new Cell(1, 1); newGene[2][1] = new Cell(1, 1); newGene[2][2] = new Cell(1, 1);
+            creatureTest(newGene);
+
+            newGene[0][0] = new Cell(1, 1); newGene[0][1] = new Cell(0, 0); newGene[0][2] = new Cell(0, 0);
+            newGene[1][0] = new Cell(0, 0); newGene[1][1] = new Cell(2, 2); newGene[1][2] = new Cell(1, 1);
+            newGene[2][0] = new Cell(1, 1); newGene[2][1] = new Cell(1, 1); newGene[2][2] = new Cell(0, 0);
+            creatureTest(newGene);
+
+            Environment.Exit(0);
+#endif
+#if DIETTEST
+            Cell[][] cc = new Cell[10][];
+            Cell[][] ch = new Cell[10][];
+            for (int i = 0; i < 10; i++)
+            {
+                cc[i] = new Cell[10];
+                ch[i] = new Cell[10];
+                for (int j = 0; j < 10; j++)
+                {
+                    cc[i][j] = new Cell(0, 0);
+                    ch[i][j] = new Cell(6, 6);
+                }
+            }
+            Creature carn = new Creature(new Gene(cc));
+            Creature herb = new Creature(new Gene(ch));
+            List<FoodSource> foodToSort = new List<FoodSource>();
+            plantFoodValue = 1000;
+            remainsFoodValue = 1000;
+            foodToSort.Add(new Plant(new Random()));
+            foodToSort.Add(new Remains(new Random()));
+
+            FoodSource carnChoice = carn.pubGetMostNourishing(foodToSort);
+            FoodSource herbChoice = herb.pubGetMostNourishing(foodToSort);
+
+            Console.WriteLine("Diet: Carnivore : " + carn.getDiet() + " Herbivore: " + herb.getDiet());
+            Console.WriteLine("Actual values: Plant: " + foodToSort[0].getFoodValue() + " Remains: " + foodToSort[1].getFoodValue());
+            Console.WriteLine("Carnivore sees plant as: " + carn.pubGetNourishmentAmt(foodToSort[0]) + " and remains as " + carn.pubGetNourishmentAmt(foodToSort[1]));
+            Console.WriteLine("Herbivore sees plant as: " + herb.pubGetNourishmentAmt(foodToSort[0]) + " and remains as " + herb.pubGetNourishmentAmt(foodToSort[1]));
+            Console.WriteLine("Carnivore chooses meat: " + !carnChoice.isPlant());
+            Console.WriteLine("Herbivore chooses plant: " + herbChoice.isPlant());
+            Environment.Exit(0);
+#endif
+#if BREEDTEST
+            Cell[][] newGene = new Cell[10][];
+            for (int i = 0; i < newGene.Length; i++)
+            {
+                newGene[i] = new Cell[10];
+                for (int j = 0; j < newGene[i].Length; j++)
+                {
+                    newGene[i][j] = new Cell(0, 0);
+                }
+            }
+            Gene g = new Gene(newGene, new Random());
+            for (int i = 0; i < 100; i++)
+            {
+                g.breedWith(g);
+            }
+            Environment.Exit(0);
+#endif
+            #endregion
             base.Update(gameTime);
             if (numGenerations > currentGeneration || numGenerations == -1) 
             {
@@ -501,14 +668,15 @@ namespace Genome
             try
             {
                 StreamReader sr = new StreamReader(fileLocation);
+                recognisedShapes = new List<Shape>();
                 string s = sr.ReadLine();
                 while (!s.Equals("### BEGIN ###")) //parser starts at ### BEGIN ###
                 {
                     s = sr.ReadLine();
                 }
+                s = sr.ReadLine();
                 while (s != null)
                 {
-                    s = sr.ReadLine();
                     string[] dims = s.Split('x'); //each shape begins with a description of its dimensions in the form AxB;
                     int dimX = int.Parse(dims[0]);
                     int dimY = int.Parse(dims[1]);
@@ -529,6 +697,7 @@ namespace Genome
                             else
                             {
                                 cells[i][j] = (int)char.GetNumericValue(c[j]);
+                                cells[i][j]--;
                             }
                         }
                         s = sr.ReadLine();
@@ -603,6 +772,37 @@ namespace Genome
         }
 
         #endregion
+
+#if PATTERNTEST
+        private void geneTest(Gene g)
+        {
+            List<ParamToken> pm = g.getPosMods();
+            List<ParamToken> nm = g.getNegMods();
+            Console.WriteLine();
+            Console.WriteLine("POSITIVES");
+            foreach (ParamToken pos in pm)
+            {
+                Console.WriteLine(pos);
+            }
+            Console.WriteLine();
+            Console.WriteLine("NEGATIVES");
+            foreach (ParamToken neg in nm)
+            {
+                Console.WriteLine(neg);
+            }
+        }
+#endif
+#if POLLTEST
+        private void creatureTest(Cell[][] newGene)
+        {
+            Creature cret = new Creature(new Gene(newGene));
+            Dictionary<Scenario, Response> beh = cret.getBehaviour();
+            foreach (Scenario s in beh.Keys)
+            {
+                Console.WriteLine("Scen: " + s + " Resp: " + beh[s]);
+            }
+        }
+#endif
 
         #endregion
 

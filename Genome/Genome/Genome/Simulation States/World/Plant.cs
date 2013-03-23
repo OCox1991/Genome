@@ -36,6 +36,11 @@ namespace Genome
             }
         }
 
+        public override bool isPlant()
+        {
+            return true;
+        }
+
         public bool isDepeleted()
         {
             return foodRemaining == 0;

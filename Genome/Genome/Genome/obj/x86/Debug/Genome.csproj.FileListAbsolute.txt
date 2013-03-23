@@ -27,3 +27,4 @@ C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content
 C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Restart.xnb
 C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Resume.xnb
 C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\BackButton.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Shapes.txt
