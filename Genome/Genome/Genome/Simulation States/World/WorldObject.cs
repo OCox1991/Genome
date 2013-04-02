@@ -6,14 +6,25 @@ using Microsoft.Xna.Framework;
 
 namespace Genome
 {
+    /// <summary>
+    /// A WorldObject represents any object that can be placed in the world
+    /// </summary>
     abstract class WorldObject
     {
         private Vector2 location;
 
+        /// <summary>
+        /// Initialises the WorldObject, but doesn't do anything else
+        /// </summary>
         public WorldObject()
         {
         }
 
+        /// <summary>
+        /// Sets the location of the WorldObject
+        /// </summary>
+        /// <param name="x">The x location of the WorldObject</param>
+        /// <param name="y">The y location of the WorldObject</param>
         public void setLocation(int x, int y)
         {
 #if DEBUG
@@ -25,6 +36,11 @@ namespace Genome
             location = new Vector2(x, y);
         }
 
+        /// <summary>
+        /// Gets the location of the WorldObject as an array of ints
+        /// </summary>
+        /// <returns>An array of ints representing the location of the WorldObject, with 
+        /// the x location as the 0th element and the y location as the 1st element</returns>
         public int[] getLocationXY()
         {
             return new int[] { (int)location.X, (int)location.Y };
@@ -42,6 +58,12 @@ namespace Genome
             return Math.Abs(xy[0]) + Math.Abs(xy[1]);
         }
 
+        /// <summary>
+        /// Gets the euclidean distance of this object from a given object
+        /// </summary>
+        /// <param name="o">The object to get the distance from</param>
+        /// <returns>The euclidean distance from this object to the specified object as a
+        /// double</returns>
         public double getEuclideanDistanceFrom(WorldObject o) //a^2 + b^2 = c^2
         {
             int[] xy = getRelativeLocation(o);
@@ -51,6 +73,12 @@ namespace Genome
             return Math.Sqrt(a2 + b2);
         }
 
+        /// <summary>
+        /// Gets the relative location of a specified WorldObject from this one, that is, gets the
+        /// location of the specified WorldObject as if this WorldObject was as 0,0
+        /// </summary>
+        /// <param name="o">The WorldObject to get the relative location of</param>
+        /// <returns>The relative location of the specified object as a 2 element array of ints</returns>
         public int[] getRelativeLocation(WorldObject o)
         {
             int locX = o.getLocationXY()[0] - this.getLocationXY()[0];
@@ -58,6 +86,11 @@ namespace Genome
             return new int[] { locX, locY };
         }
 
+        /// <summary>
+        /// Gets the direction to a specifed WorldObject from this one
+        /// </summary>
+        /// <param name="o">The object to get the direction to</param>
+        /// <returns>The direction from this object to get to the specified object</returns>
         public Direction getDirectionTo(WorldObject o)
         {
             int[] relativeLoc = getRelativeLocation(o);
@@ -138,6 +171,11 @@ namespace Genome
             return d;
         }
 
+        /// <summary>
+        /// Checks if this object is adjacent to another object
+        /// </summary>
+        /// <param name="o">The object to check if this object is adjacent to</param>
+        /// <returns>True if this object is adjacent to the other and false otherwise</returns>
         public bool isAdjacent(WorldObject o)
         {
             int[] loc = this.getRelativeLocation(o);

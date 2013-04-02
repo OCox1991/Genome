@@ -54,6 +54,10 @@ namespace Genome
             addCreatures();
         }
 
+        /// <summary>
+        /// Starts a new world with a random seed and a specified list of creatures
+        /// </summary>
+        /// <param name="creatures"></param>
         public WorldState(List<Creature> creatures)
         {
             Random r = new Random();
@@ -63,14 +67,23 @@ namespace Genome
             addCreatures(creatures);
         }
 
-        public WorldState(Random r, int seed, List<Creature> creatures)
+        /// <summary>
+        /// Starts a new world with a specified seed and list of creatures
+        /// </summary>
+        /// <param name="seed">The seed to initialise the random number generator with</param>
+        /// <param name="creatures">The list of creatures to populate the world with</param>
+        public WorldState(int seed, List<Creature> creatures)
         {
-            randomNumberGenerator = r;
             this.seed = seed;
+            randomNumberGenerator = new Random(seed);
             setUpWorld();
             addCreatures(creatures);
         }
 
+        /// <summary>
+        /// Resets the world and restarts it with a specified list of creatures
+        /// </summary>
+        /// <param name="newCreatureList">The list of creatures to use as the new creature list</param>
         public void reset(List<Creature> newCreatureList)
         {
             List<Creature> allCreatures = new List<Creature>();
@@ -94,6 +107,9 @@ namespace Genome
             addCreatures(newCreatureList);
         }
 
+        /// <summary>
+        /// Sets up the world, performing all actions common to all the constructors
+        /// </summary>
         public void setUpWorld()
         {
             timer = 0;
@@ -495,21 +511,45 @@ namespace Genome
             return getTile(y, x).getCreature();
         }
 
+        /// <summary>
+        /// Checks if there is a plant at the specified location
+        /// </summary>
+        /// <param name="x">The x of the location to check</param>
+        /// <param name="y">The y of the location to checl</param>
+        /// <returns>Whether there is a plant at the specified location</returns>
         public bool plantAt(int x, int y)
         {
             return getTile(y, x).plantPresent();
         }
 
+        /// <summary>
+        /// Gets the plant at a specified location
+        /// </summary>
+        /// <param name="x">The x part of the location to look for the plant at</param>
+        /// <param name="y">The y part of the location to look for the plant at</param>
+        /// <returns>The plant at the specified location</returns>
         public Plant getPlantAt(int x, int y)
         {
             return getTile(y, x).getPlant();
         }
 
+        /// <summary>
+        /// Checks if there are remains at the specified location
+        /// </summary>
+        /// <param name="x">The x of the location to check</param>
+        /// <param name="y">The y of the location to checl</param>
+        /// <returns>Whether there are remains at the specified location</returns>
         public bool remainsAt(int x, int y)
         {
             return getTile(y, x).remainsPresent();
         }
 
+        /// <summary>
+        /// Gets the remains at a specified location
+        /// </summary>
+        /// <param name="x">The x part of the location to look for the remains at</param>
+        /// <param name="y">The y part of the location to look for the remains at</param>
+        /// <returns>The remains at the specified location</returns>
         public Remains getRemainsAt(int x, int y)
         {
             return getTile(y, x).getRemains();
@@ -571,6 +611,12 @@ namespace Genome
             return val;
         }
 
+        /// <summary>
+        /// The update method of the world, uses a momentum based update system that updates more and
+        /// more creatures while the Simulation is not running slowly and halves the number of
+        /// Creatures being updated each time the Simulation starts running slowly
+        /// </summary>
+        /// <param name="gameTime">The time since the update method was last called</param>
         public override void update(GameTime gameTime)
         {
             int speed = inputHandler.getSpeed();
@@ -594,6 +640,9 @@ namespace Genome
             inputHandler.update(gameTime);
         }
 
+        /// <summary>
+        /// The drawing method, calls the draw method on the inputHandler for the world
+        /// </summary>
         public override void draw()
         {
             inputHandler.draw();

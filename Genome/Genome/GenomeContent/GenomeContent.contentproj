@@ -163,6 +163,10 @@
       <Name>Shapes</Name>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Help\User Documentation for the Genome Project.docx">
+      <Name>User Documentation for the Genome Project</Name>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Clone.png">

@@ -97,7 +97,7 @@ namespace Genome
             //strength, speed, awareness, defence, stealthval
             //DEFAULT VALUES INITIALISATION
 
-            awareness = 25; //TODO: Make these modifiable (if time permits)
+            awareness = 10; //TODO: Make these modifiable (if time permits)
             initEnergy = 100;
             strength = 50;
             speed = 50;
@@ -155,7 +155,7 @@ namespace Genome
 
             //multiply some values to make them higher, eg energy should be around 1000 at default.
             initEnergy *= 100;
-            awareness /= 5;
+            awareness /= 2;
 
             health = maxHealth;
             energy = initEnergy;
@@ -211,21 +211,24 @@ namespace Genome
                 double dietMod = (double)colourCount[i] * 0.005; //0.005 since max of 1 colour is 100 and default diet == 0.5 so 100 * 0.005 + 0.5 = 1 AKA the max/min value of the diet
                 diet -= dietMod; 
             }
-            i = 3;
-            if (diet > 0.5)
+            if (Simulation.getNormaliseDiet())
             {
-                diet -= (int)(float)colourCount[i] * 0.005;
-                if (diet < 0.5)
-                {
-                    diet = 0.5;
-                }
-            }
-            else if (diet < 0.5)
-            {
-                diet += (int)(float)colourCount[i] * 0.005;
+                i = 3;
                 if (diet > 0.5)
                 {
-                    diet = 0.5;
+                    diet -= (int)(float)colourCount[i] * 0.005;
+                    if (diet < 0.5)
+                    {
+                        diet = 0.5;
+                    }
+                }
+                else if (diet < 0.5)
+                {
+                    diet += (int)(float)colourCount[i] * 0.005;
+                    if (diet > 0.5)
+                    {
+                        diet = 0.5;
+                    }
                 }
             }
         }
@@ -1520,7 +1523,6 @@ namespace Genome
         }
 
         #region user manual controls
-        //TODO: add buttons for this
 
         /// <summary>
         /// Clones this creature and adds it at a random location in the world

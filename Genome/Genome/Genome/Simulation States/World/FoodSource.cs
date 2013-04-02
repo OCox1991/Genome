@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Genome
 {
+    /// <summary>
+    /// FoodSource represents anything in the world that can be eaten, Plants & Remains
+    /// </summary>
     abstract class FoodSource : WorldObject
     {
         protected int foodRemaining; //these 3 will be set by each subclass since they need to be different for each
@@ -70,11 +73,19 @@ namespace Genome
             }
         }
 
+        /// <summary>
+        /// Returns the number of ticks before the act method is called
+        /// </summary>
+        /// <returns>The number of ticks until the act method is called as an int</returns>
         public int getTicksRemainingBeforeAction()
         {
             return actTimer - timeTillActing;
         }
 
+        /// <summary>
+        /// Returns if the FoodSource can be eaten, that is, if it has any food units still remaining on it
+        /// </summary>
+        /// <returns>If there is more than 0 food units remaining in the foodsource</returns>
         public bool canBeEaten()
         {
             return foodRemaining > 0;

@@ -51,6 +51,7 @@ namespace Genome
         private static int healthRejuvenationPercent = 1; //%age
 
         private static int mutationChance = 100; // 1:x chance
+        private static bool normaliseDiet = false; //bool
 
         //Round rules
         private static int roundLengths = 10000; //flat
@@ -87,6 +88,16 @@ namespace Genome
         #region Methods
 
         #region Game rules related
+
+        public static bool getNormaliseDiet()
+        {
+            return normaliseDiet;
+        }
+
+        public static void setNormaliseDiet(bool val)
+        {
+            normaliseDiet = val;
+        }
 
         public static int getNumTicks()
         {

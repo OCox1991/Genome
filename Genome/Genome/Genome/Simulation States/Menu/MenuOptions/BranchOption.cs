@@ -39,12 +39,17 @@ namespace Genome
             options.Add(m);
         }
 
+        /// <summary>
+        /// Gets the visible objects in the list, used when there are more options than can be fit onto the screen. Not used at the moment, and seem to cause
+        /// some errors when actually used. //TODO: fix this issue since it hurts extensibility
+        /// </summary>
+        /// <returns></returns>
         public List<MenuOption> getVisOptions()
         {
             List<MenuOption> returning;
             if (listDispLength < options.Count)
             {
-                returning = options.GetRange(listTop, listDispLength); //TODO: work out odd bug with this code
+                returning = options.GetRange(listTop, listDispLength);
             }
             else
             {
@@ -105,7 +110,7 @@ namespace Genome
         }
 
         /// <summary>
-        /// Draws the list of options
+        /// Draws the list of options below this branch
         /// </summary>
         public override void draw()
         {

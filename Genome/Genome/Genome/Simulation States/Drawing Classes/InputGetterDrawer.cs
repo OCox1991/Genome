@@ -7,12 +7,19 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Genome
 {
+    /// <summary>
+    /// The InputGetterDrawer is responsible for drawing the InputGetterOption associated with it
+    /// </summary>
     class InputGetterDrawer
     {
-        private InputGetterOption option;
-        private SpriteFont font;
-        private SpriteBatch sb;
+        private InputGetterOption option; //The option associated with this one
+        private SpriteFont font; //The SpriteFont to use
+        private SpriteBatch sb; //The SpriteBatch, gotten from Display during initialisation
 
+        /// <summary>
+        /// Sets up the drawer, getting the font and spritebatch from the Display class
+        /// </summary>
+        /// <param name="option">The InputGetterOption that this object is in charge of drawing</param>
         public InputGetterDrawer(InputGetterOption option)
         {
             this.option = option;
@@ -20,6 +27,9 @@ namespace Genome
             sb = Display.getSpriteBatch();
         }
 
+        /// <summary>
+        /// The method that does everything necessary to draw the InputGetterOption
+        /// </summary>
         public void draw()
         {
             string title = option.getText();
@@ -54,7 +64,7 @@ namespace Genome
             {
                 lines[0] = desc;
             }
-            string input = option.getInput();
+            string input = option.Input;
             OptionButton okBtn = option.getButton();
             sb.Begin();
             sb.DrawString(font, title, new Vector2(Display.getWindowWidth() / 2 - Display.measureString(title).X / 2, 30), Color.Black);
@@ -79,6 +89,7 @@ namespace Genome
             sb.DrawString(font, input, new Vector2(Display.getWindowWidth() / 2 - Display.measureString(input).X, starty + 30), Color.Black);
             okBtn.setLocation(new Vector2(Display.getWindowWidth() / 2 - okBtn.getWidth() / 2), new Vector2(okBtn.getWidth(), okBtn.getHeight()));
             sb.End();
+            //Once we've drawn everything else, use the Display's method to draw the button associated with the option
             Display.drawButton(okBtn);
         }
     }

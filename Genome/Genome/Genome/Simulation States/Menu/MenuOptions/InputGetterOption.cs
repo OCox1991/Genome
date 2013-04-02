@@ -7,18 +7,27 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Genome
 {
+    /// <summary>
+    /// The InputGetterOption gets input from the keyboard for the int options. Since only numbers are needed the InputGetter only recognises the numbers 1 to 0 and the minus symbol
+    /// </summary>
     class InputGetterOption : MenuOption
     {
         private KeyboardState currentState;
         private KeyboardState prevState;
         private IntLeafOption returnOption;
         private string input;
+        //Public accessors for private input variable
         public string Input
         {
             get { return input; }
         }
         private InputGetterDrawer drawer;
 
+        /// <summary>
+        /// Sets up the option, associates it with a menu and the IntLeafOption that needed it to get the input
+        /// </summary>
+        /// <param name="menu">The menu that this option is a part of</param>
+        /// <param name="option">The option that needed the InputGetter to get some input for it</param>
         public InputGetterOption(Menu menu, IntLeafOption option)
             : base("OK", "Enter Value:", option.getDescription(), menu)
         {
@@ -27,6 +36,9 @@ namespace Genome
             drawer = new InputGetterDrawer(this);
         }
 
+        /// <summary>
+        /// When the button associated with an InputGetter is selected it informs the IntLeafOption that created it that it has new input for it.
+        /// </summary>
         public override void clicked()
         {
             menu.passInput(input, returnOption);
@@ -70,11 +82,9 @@ namespace Genome
             }
         }
 
-        public string getInput()
-        {
-            return input;
-        }
-
+        /// <summary>
+        /// Calls the draw method of the InputGetterDrawer associated with this object
+        /// </summary>
         public override void draw()
         {
             drawer.draw();

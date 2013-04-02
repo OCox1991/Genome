@@ -5,6 +5,10 @@ using System.Text;
 
 namespace Genome
 {
+    /// <summary>
+    /// The TextureNames enum is used to store the textures once they are loaded in a way that
+    /// associates them with their purpose, allowing classes that need them to retrieve them trivially. 
+    /// </summary>
     enum TextureNames
     {
         CREATURE,

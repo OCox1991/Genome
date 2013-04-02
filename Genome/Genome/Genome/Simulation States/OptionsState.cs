@@ -5,12 +5,19 @@ using System.Text;
 
 namespace Genome
 {
+    /// <summary>
+    /// The OptionsState extends the Menu class and stores MenuOptions to modify parameters of the Simulation
+    /// </summary>
     class OptionsState : Menu
     {
+        /// <summary>
+        /// Initialises the OptionsState to contain and several MenuOptions and sets the initial option
+        /// </summary>
         public OptionsState() : base()
         {
             BranchOption initialState = new BranchOption("Options", "", this);
             BranchOption simulationOption = new BranchOption("Simulation options", "Options related to how the interface looks and functions", this);
+            simulationOption.addOption(new BoolLeafOption("View creatures in world as Genes: ", "Sets if the creatures in the world appear as small creature icons or as the creature's gene", this, Display.getDrawCreaturesAsGenes, Display.setDrawCreaturesAsGenes));
             simulationOption.addOption(new BoolLeafOption("Follow selected world objects: ", "If true the viewing window will follow any selected creature plant or remains", this, Simulation.getFollowOnClick, Simulation.setFollowOnClick));
             simulationOption.addOption(new IntLeafOption("Generation to stop at: ", "Sets the generation to stop running at, useful if you need to check progress at a specific state.", this, Simulation.getTargetGeneration, Simulation.setTargetGeneration, int.MaxValue, -1));
             simulationOption.addOption(new IntLeafOption("Number of ticks per generation: ", "Sets how many ticks it takes before a generation ends, minimum value: 1", this, Simulation.getRoundLength, Simulation.setRoundLength, int.MaxValue, 1));
@@ -31,12 +38,12 @@ namespace Genome
 
             BranchOption creatureOption = new BranchOption("Creature options", "Options related to how creatures live and behave", this);
             //TODO: add allow move if costs health bool
-            //TODO: add converting energy into stamina per tick
             creatureOption.addOption(new IntLeafOption("Starving energy level", "The level of energy below which creatures will see themselves as starving, changing their behaviour", this, Simulation.getStarvingEnergyLevel, Simulation.setStarvingEnergyLevel));
             creatureOption.addOption(new IntLeafOption("Wounded energy level", "The level of health below which creatures will see themselves as wounded, changing their behaviour", this, Simulation.getWoundedHealthPercent, Simulation.setWoundedHealthPercent));
             creatureOption.addOption(new IntLeafOption("Energy drain per tick", "The amount of energy a creature will lost per tick, just by continuing to exist", this, Simulation.getEnergyDrainPerTick, Simulation.setEnergyDrainPerTick));
             creatureOption.addOption(new IntLeafOption("Stamina regen percent per tick", "The percentage of stamina that is regenerated per turn", this, Simulation.getStaminaRegenSpeed, Simulation.setStaminaRegenSpeed, 100, 1));
             creatureOption.addOption(new IntLeafOption("Health regen percent per tick", "The percentage of health that is regenerated per turn", this, Simulation.getHealthRegenSpeed, Simulation.setHealthRegenSpeed, 100, 1));
+            creatureOption.addOption(new BoolLeafOption("Threes move diet towards 0.5", "Sets if every instance of the colour 3 in a creature's diet moves it further towards being an omnivore, by default this is false", this, Simulation.getNormaliseDiet, Simulation.setNormaliseDiet));
             initialState.addOption(creatureOption);
 
             BranchOption judgingOption = new BranchOption("Judging & breeding options", "Options related to how the creatures are judged by the program and breeding them together", this);

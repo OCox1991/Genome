@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Genome
 {
+    /// <summary>
+    /// Direction represents the various directions a creature can move
+    /// </summary>
     public enum Direction
     {
         NORTH,
@@ -17,8 +20,16 @@ namespace Genome
         NORTHEAST
     }
 
+    /// <summary>
+    /// Extension methods for the Directions to allow us to find other directions related to the original
+    /// </summary>
     public static class DirectionExtensions
     {
+        /// <summary>
+        /// Finds the opposite direction to a specified direction
+        /// </summary>
+        /// <param name="d">The direction to find the opposite to</param>
+        /// <returns>The opposite direction to the one given, for example NORTH would return SOUTH</returns>
         public static Direction opposite(this Direction d)
         {
             Direction dir = Direction.NORTH;
@@ -36,6 +47,11 @@ namespace Genome
             return dir;
         }
 
+        /// <summary>
+        /// Returns the direction to the right of a given direction
+        /// </summary>
+        /// <param name="d">The direction to find the direction to the right of</param>
+        /// <returns>The direction 1 turn to the right from the specified direction for example NORTH would give NORTHEAST</returns>
         public static Direction right(this Direction d)
         {
             Direction dir = Direction.NORTH;
@@ -53,6 +69,11 @@ namespace Genome
             return dir;
         }
 
+        /// <summary>
+        /// Returns a random direction
+        /// </summary>
+        /// <param name="d">A given direction, which is not actually used by the method</param>
+        /// <returns>A random direction</returns>
         public static Direction randomDirection(this Direction d)
         {
             Random r = new Random();

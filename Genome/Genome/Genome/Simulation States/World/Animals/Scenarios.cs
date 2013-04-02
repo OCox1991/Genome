@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Genome
 {
+    /// <summary>
+    /// Scenario contains all the possible Scenarios that the creature could encounter
+    /// </summary>
     public enum Scenario
     {
         NOTHING, //USED WHEN KEEPING TRACK OF SCENARIOS IN CREATURE
@@ -25,6 +28,9 @@ namespace Genome
         MULT_FOOD
     }
 
+    /// <summary>
+    /// Response contains all the Responses the creature could have to the different scenarios
+    /// </summary>
     public enum Response
     {
         //SEEING CREATURE(S) + FOOD
@@ -69,8 +75,16 @@ namespace Genome
         RANDOM
     }
 
+    /// <summary>
+    /// Extension methods for the Scenario
+    /// </summary>
     public static class ScenarioExtensions
     {
+        /// <summary>
+        /// Returns the 7 possible responses the creature could have to a specific Scenario
+        /// </summary>
+        /// <param name="self">The Scenario to be checked</param>
+        /// <returns>The possible Responses to the Scenario</returns>
         public static Response[] PossibleResponses(this Scenario self)
         {
             Response[] responses = new Response[7];
@@ -111,6 +125,11 @@ namespace Genome
             return responses;
         }
 
+        /// <summary>
+        /// Returns the list of all Scenarios
+        /// </summary>
+        /// <param name="self">The scenario this method is called on, not used in the method</param>
+        /// <returns>All possible scenarios</returns>
         public static Scenario[] AllScenarios(this Scenario self)
         {
             return new Scenario[] { Scenario.CREATURE, Scenario.CREATURE_FOOD, Scenario.CREATURE_MULT_FOOD, Scenario.FOOD, Scenario.IN_COMBAT, Scenario.IN_COMBAT_CREATURE, 

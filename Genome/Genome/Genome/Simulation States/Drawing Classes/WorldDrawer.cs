@@ -11,6 +11,9 @@ using Microsoft.Xna.Framework.Media;
 
 namespace Genome
 {
+    /// <summary>
+    /// The WorldDrawer is responsible for drawing a World associated with a given WorldInputHandler
+    /// </summary>
     class WorldDrawer
     {
         private WorldInputHandler inputHandler;
@@ -27,6 +30,11 @@ namespace Genome
         private const string tileLocText = "Tile ";
         private SpriteFont spriteFont;
 
+        /// <summary>
+        /// Sets up the Drawer, getting all the necessary textures etc. from Display and storing them and associates the
+        /// drawer with a WorldInputHandler
+        /// </summary>
+        /// <param name="inputHandler">The WorldInputHandler that forms an intermediate step between the Drawer and the actual world model</param>
         public WorldDrawer(WorldInputHandler inputHandler)
         {
             this.inputHandler = inputHandler;
@@ -44,11 +52,14 @@ namespace Genome
             spriteFont = Display.getFont();
         }
 
+        /// <summary>
+        /// Draws the world, calling several sub methods
+        /// </summary>
         public void draw()
         {
-            drawWorld();
-            drawTop();
-            if(inputHandler.viewingSomething())
+            drawWorld(); //Draw the world
+            drawTop(); //Draw the top menu
+            if(inputHandler.viewingSomething()) //Draw a viewing window if necessary
             {
                 if (inputHandler.viewingACreature())
                 {
@@ -63,23 +74,30 @@ namespace Genome
                    drawRemainsView(inputHandler.getRemains());
                 }
             }
+            //Draw all buttons
             foreach (Button b in inputHandler.getButtons())
             {
                 Display.drawButton(b);
             }
         }
 
+        /// <summary>
+        /// Draws the world. The Tiles to draw and the location to start drawing them is provided by the WorldInputHandler, the WorldDrawer actually
+        /// never sees the whole contents of the world, just the bits passed to it by the InputHandler
+        /// </summary>
         private void drawWorld()
         {
             Vector2 loc = inputHandler.getLocation();
             Tile[][] drawTiles = inputHandler.getTilesVisible();
             Vector2 drawLoc = new Vector2(0 , 0);
             float tileSize = Display.getTileSize();
+            //Work out where to start drawing the tiles, so that you don't just always have the top left of a tile at the top left of the screen
             if (Math.Abs(loc.X) % tileSize != 0 || Math.Abs(loc.Y) % tileSize != 0) //if loc is not exactly on a tile
             {
                 drawLoc = new Vector2(-(Math.Abs(loc.X) % tileSize), -(Math.Abs(loc.Y) % tileSize));
             }
 
+            //Then start drawing the tiles
             for (int x = 0; x < drawTiles.Length; x++)
             {
                 for (int y = 0; y < drawTiles[x].Length; y++)
@@ -91,6 +109,11 @@ namespace Genome
             }
         }
 
+        /// <summary>
+        /// Draws a single tile at a specified location
+        /// </summary>
+        /// <param name="r">The rectangle that the tile should be drawn in</param>
+        /// <param name="t">The tile to be drawn</param>
         private void drawTile(Rectangle r, Tile t)
         {
             Simulation.getGraphicsDeviceManager().GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
@@ -133,6 +156,9 @@ namespace Genome
             spriteBatch.End();
         }
 
+        /// <summary>
+        /// Draws the top menu, including all the strings that are needed.
+        /// </summary>
         private void drawTop()
         {
             int[] loc = inputHandler.getTileLoc();
@@ -141,7 +167,7 @@ namespace Genome
             spriteBatch.Begin();
             spriteBatch.Draw(topBar, new Rectangle(0, 0, 1024, 150), Color.White);
             spriteBatch.DrawString(spriteFont, speed, new Vector2(20, 65), Color.Black);
-            spriteBatch.DrawString(spriteFont, inputHandler.getSpeed().ToString(), new Vector2(20 + spriteFont.MeasureString(speed).X + 35 + 30, 65), Color.Black);
+            spriteBatch.DrawString(spriteFont, inputHandler.getSpeed().ToString(), new Vector2(spriteFont.MeasureString(speed).X + 35 + 30, 65), Color.Black);
             spriteBatch.DrawString(spriteFont, locationData, new Vector2(20, (60 + spriteFont.MeasureString(speed).Y + 20)), Color.Black);
             spriteBatch.DrawString(spriteFont, roundInfo(), new Vector2(1019 - spriteFont.MeasureString(roundInfo()).X, 10), Color.Black);
             spriteBatch.DrawString(spriteFont, generationInfo(), new Vector2(1019 - spriteFont.MeasureString(generationInfo()).X, 15 + spriteFont.MeasureString(roundInfo()).Y), Color.Black);
@@ -151,12 +177,21 @@ namespace Genome
             spriteBatch.End();
         }
 
+        /// <summary>
+        /// Returns a string that contains the round info gotten from the Simulation in a way that is suitable for display
+        /// </summary>
+        /// <returns>The round info in the format "Current Round: x/y" where x = current round, y = rounds per generation</returns>
         private string roundInfo()
         {
             string r = "Current Round: " + Simulation.getNumTicks() + "/" + Simulation.getRoundLength();
             return r;
         }
 
+        /// <summary>
+        /// Returns the generation info as a string that is suitable for display
+        /// </summary>
+        /// <returns>The Generation information in the form "Generation: x" where x = current generation. 
+        /// If a stopping generation has been specified adds "(Stopping at: y)" where y is the generation to stop at</returns>
         private string generationInfo()
         {
             string r = "Generation: " + Simulation.getGeneration();
@@ -167,12 +202,21 @@ namespace Genome
             return r;
         }
 
+        /// <summary>
+        /// Gets information about the number of creatures still alive in the form of a string that is suitable for display
+        /// </summary>
+        /// <returns>Information of the number of creatures still alive in the form "Creatures alive: x/y" where x is the number of creatures alive and y
+        /// is the current Simulation setting for the Creature population</returns>
         private string creatureInfo()
         {
             string r = "Creatures alive: " + inputHandler.getCreaturesAlive() + "/" + Simulation.getPopulation();
             return r; 
         }
 
+        /// <summary>
+        /// Draws the creature viewing window
+        /// </summary>
+        /// <param name="c">The creature to draw the viewing window for</param>
         private void drawCreatureView(Creature c)
         {
             drawBack();
@@ -192,6 +236,10 @@ namespace Genome
             drawStrings(topLeft, title, status, 4);
         }
 
+        /// <summary>
+        /// Draws the plant viewing window
+        /// </summary>
+        /// <param name="c">The plant to draw the viewing window for</param>
         private void drawPlantView(Plant p)
         {
             drawBack();
@@ -219,6 +267,10 @@ namespace Genome
             drawStrings(topLeft, title, status, 4);
         }
 
+        /// <summary>
+        /// Draws the remains viewing window
+        /// </summary>
+        /// <param name="c">The remains object to draw the viewing window for</param>
         private void drawRemainsView(Remains r)
         {
             drawBack();
@@ -234,6 +286,9 @@ namespace Genome
             drawStrings(topLeft, title, status, 4);
         }
 
+        /// <summary>
+        /// Draws the background of the viewing windows
+        /// </summary>
         private void drawBack()
         {
             spriteBatch.Begin();
@@ -243,6 +298,13 @@ namespace Genome
             spriteBatch.End();
         }
 
+        /// <summary>
+        /// Draws an array of strings as a table with a set number of rows
+        /// </summary>
+        /// <param name="topLeft">The location to put the top left of the table</param>
+        /// <param name="title">The title of the table, which is placed slightly above the rest of the strings</param>
+        /// <param name="strings">The strings to draw in the table</param>
+        /// <param name="maxRows">The maximum number of rows to include in the table before moving over to the next column</param>
         private void drawStrings(Vector2 topLeft, string title, string[] strings, int maxRows)
         {
             spriteBatch.Begin();

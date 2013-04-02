@@ -7,12 +7,19 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Genome
 {
+    /// <summary>
+    /// The MenuBranchDrawer is in charge of drawing the menu branches, which are lists with buttons associated with them
+    /// </summary>
     class MenuBranchDrawer
     {
         private BranchOption option;
         private SpriteFont font;
         private SpriteBatch sb;
 
+        /// <summary>
+        /// Sets up the drawer, getting the font and spritebatch from the Display class
+        /// </summary>
+        /// <param name="option">The BranchOption that this object is in charge of drawing</param>
         public MenuBranchDrawer(BranchOption option)
         {
             this.option = option;
@@ -20,6 +27,9 @@ namespace Genome
             sb = Display.getSpriteBatch();
         }
 
+        /// <summary>
+        /// Draws the BranchOption associated with this drawer
+        /// </summary>
         public void draw()
         {
             string title = option.getText();

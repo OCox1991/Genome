@@ -49,6 +49,10 @@ namespace Genome
             status = "Judging Creatures...";
         }
 
+        /// <summary>
+        /// Updates the judge, moving one step foward through the judginf process
+        /// </summary>
+        /// <param name="t">The time since the update method was last called, not used in this method</param>
         public override void update(GameTime t) 
         {
             if (!isJudged) //should run through once
@@ -184,11 +188,18 @@ namespace Genome
             return ret;
         }
 
+        /// <summary>
+        /// Returns a string representing the current status of the JudgingState
+        /// </summary>
+        /// <returns>A string representing the status of the JusgingState</returns>
         public override string ToString()
         {
             return status;
         }
 
+        /// <summary>
+        /// Calls the drawer to draw the state
+        /// </summary>
         public override void draw()
         {
             drawer.draw();

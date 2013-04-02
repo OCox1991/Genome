@@ -334,16 +334,28 @@ namespace Genome
             }
         }
 
+        /// <summary>
+        /// Gets the width of the gene
+        /// </summary>
+        /// <returns>The width of the gene as an int</returns>
         public int getSizeX()
         {
             return cells.Length;
         }
 
+        /// <summary>
+        /// Gets the height of the gene
+        /// </summary>
+        /// <returns>The height of the gene as an int</returns>
         public int getSizeY()
         {
             return cells[0].Length;
         }
 
+        /// <summary>
+        /// Turns the gene into an array of strings, with each string being a row of the numbers of the gene. Used for debugging
+        /// </summary>
+        /// <returns></returns>
         public String[] toStrings()
         {
             String[] s = new String[cells[0].Length];
@@ -358,11 +370,19 @@ namespace Genome
             return s;
         }
 
+        /// <summary>
+        /// Returns the texture that the gene has stored
+        /// </summary>
+        /// <returns>The texture representing using the colour map to create the correct colours</returns>
         public Texture2D getTexture()
         {
             return texture;
         }
 
+        /// <summary>
+        /// Gets the colour count array, which contains the amount of each colour in the gene
+        /// </summary>
+        /// <returns>The colour count array, an array of ints where each index points to an int representing the number of times that colour appears in the gene</returns>
         public int[] getColourCount()
         {
             return colourCount;

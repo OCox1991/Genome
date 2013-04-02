@@ -67,11 +67,19 @@ namespace Genome
             return cells[row][col].getDomColour();
         }
 
+        /// <summary>
+        /// Returns the width of the shape
+        /// </summary>
+        /// <returns>The size of a row of the shape</returns>
         public int sizeRow()
         {
             return cells.Length;
         }
 
+        /// <summary>
+        /// Return the height of the shape
+        /// </summary>
+        /// <returns>Returns the size of column 0 of the shape</returns>
         public int sizeCol()
         {
             return cells[0].Length;

@@ -11,6 +11,10 @@ using Microsoft.Xna.Framework.Media;
 
 namespace Genome
 {
+    /// <summary>
+    /// The WorldInputHandler deals with input from the user that might affect the world, as well as serving as an intermediary between the WorldState and the WorldDrawer, cropping the tiles of
+    /// the WorldState so that the WorldDrawer only sees what it needs to draw
+    /// </summary>
     class WorldInputHandler
     {
         private static int speed; //the current speed of the simulation
@@ -33,7 +37,7 @@ namespace Genome
         private Remains remainsView; //the remains being viewed
         private Plant plantView; //the plant being viewed
         private WorldDrawer drawer; //the drawing class for the world
-        private bool start; //the start 
+        private bool start; //A flag to check if we have just started this state
         private int dataViewed;
         public int DataViewed
         {
@@ -67,8 +71,15 @@ namespace Genome
             start = false;
         }
 
+        /// <summary>
+        /// Handles update code for the inputhandler, mostly it involves dealing with the mouse and keyboard, but it also needs to make sure it doesn't keep viewing creatures that are dead or creatures from the previous
+        /// generation
+        /// </summary>
+        /// <param name="gameTime">The time since the update method was last called, not used for this method</param>
         public void update(GameTime gameTime)
         {
+            //Checks if we are at the start of a round, if so we need to make sure we deView any creature we may have been looking at from last round, but we should 
+            //only do this once so we can view new creatures while paused
             if(Simulation.getNumTicks() == 0)
             {
                 if (start) //check if we have already done this
@@ -85,6 +96,7 @@ namespace Genome
             {
                 buttons[i].update(gameTime);
             }
+            //Check if the creature we are following is dead
             if (viewingACreature())
             {
                 if (creatureView.getHealth() <= 0)
@@ -92,6 +104,7 @@ namespace Genome
                     deView();
                 }
             }
+            //Update the keyboard states, to check if Esc was pressed (if so go to main menu)
             prevState = currentState;
             currentState = Mouse.GetState();
             KeyboardState k = Keyboard.GetState();
@@ -99,6 +112,7 @@ namespace Genome
             {
                 Simulation.goToMenu();
             }
+            //If we are following an object then we should centre on it
             if (following)
             {
                 WorldObject o = null;
@@ -117,8 +131,10 @@ namespace Genome
                 int[] l = o.getLocationXY();
                 centreOnTile(l[0], l[1]);
             }
+            //Check the location of the mouse to see if it is within the boundaries of the world tiles
             if (currentState.X > topLeft.X && currentState.Y > topLeft.Y && currentState.X < topLeft.X + size.X && currentState.Y < getBottomY())
             {
+                //If we are dragging the mouse
                 if (currentState.LeftButton.Equals(ButtonState.Pressed) && prevState.LeftButton.Equals(ButtonState.Pressed))
                 {
                     Vector2 cStateLoc = new Vector2(currentState.X, currentState.Y);
@@ -130,6 +146,7 @@ namespace Genome
                         updateLocation(prevStateLoc.X - cStateLoc.X, prevStateLoc.Y - cStateLoc.Y);
                     }
                 }
+                //If we just clicked the mouse or released it when we had been dragging
                 else if (currentState.LeftButton.Equals(ButtonState.Released) && prevState.LeftButton.Equals(ButtonState.Pressed))
                 {
                     if (dragging)
@@ -146,11 +163,18 @@ namespace Genome
             }
         }
 
+        /// <summary>
+        /// Draws the world as interpreted by the input handler
+        /// </summary>
         public void draw()
         {
             drawer.draw();
         }
 
+        /// <summary>
+        /// Gets the bottom of the tile area, with methods to avoid dragging if the viewing window is up
+        /// </summary>
+        /// <returns>The location of the bottom of the tile area as a float</returns>
         private float getBottomY()
         {
             float bottom = topLeft.Y + size.Y;
@@ -161,6 +185,10 @@ namespace Genome
             return bottom;
         }
 
+        /// <summary>
+        /// Centres the viewing are on a given Vector2 location
+        /// </summary>
+        /// <param name="location">The location to centre the viewing area on as a Vector2</param>
         private void centreOn(Vector2 location)
         {
             Vector2 centre = new Vector2(12 * Display.getTileSize(), 6 * Display.getTileSize());
@@ -185,57 +213,103 @@ namespace Genome
             this.location = new Vector2(lx, ly);
         }
 
+        /// <summary>
+        /// Centres the viewing area on a specified tile using the centreOnMethod
+        /// </summary>
+        /// <param name="x">The x location of the tile to centre on</param>
+        /// <param name="y">The y location of the tile to centre on</param>
         private void centreOnTile(int x, int y)
         {
             centreOn(new Vector2(x * Display.getTileSize(), y * Display.getTileSize()));
         }
 
+        /// <summary>
+        /// Gets all the buttons associated with this InputHandler
+        /// </summary>
+        /// <returns>A typed list of all the buttons associated with this object, used by the drawer</returns>
         public List<Button> getButtons()
         {
             return buttons;
         }
 
+        /// <summary>
+        /// Gets the top left location of the world viewing area, that is, the area that the tiles start appearing, not the top menu
+        /// </summary>
+        /// <returns></returns>
         public Vector2 getTopLeft()
         {
             return topLeft;
         }
 
+        /// <summary>
+        /// Gets the size of the viewing area, that is, the area in which tiles appear
+        /// </summary>
+        /// <returns></returns>
         public Vector2 getSize()
         {
             return size;
         }
 
+        /// <summary>
+        /// Gets the location we are viewing, that is the location the top left of the viewing area is looking at in the tiles, for example if it was 40, 40 we would be viewing
+        /// 40 pixels by 40 pixels away from the 0, 0 point of the world.
+        /// </summary>
+        /// <returns></returns>
         public Vector2 getLocation()
         {
             return location;
         }
 
+        /// <summary>
+        /// Gets the location of the mouse in relation to the location the viewing area is looking at and the topleft as a Vector2
+        /// </summary>
+        /// <returns>The location of the mouse as a Vector2</returns>
         private Vector2 getMouseLocation()
         {
             Vector2 loc = getLocation();
             return new Vector2(loc.X + currentState.X - topLeft.X, loc.Y + currentState.Y - topLeft.Y);
         }
 
+        /// <summary>
+        /// Returns if the input handler is viewing anything
+        /// </summary>
+        /// <returns>True if the input handler is viewing something, false otherwise</returns>
         public bool viewingSomething()
         {
             return viewing;
         }
 
+        /// <summary>
+        /// Returns if the input handler is viewing a creature
+        /// </summary>
+        /// <returns>True if the input handler is viewing a creature, false otherwise</returns>
         public bool viewingACreature()
         {
             return creatureView != null;
         }
 
+        /// <summary>
+        /// Returns if the input handler is viewing a plant
+        /// </summary>
+        /// <returns>True if the input handler is viewing a plant, false otherwise</returns>
         public bool viewingAPlant()
         {
             return plantView != null;
         }
 
+        /// <summary>
+        /// Returns if the input handler is viewing remains
+        /// </summary>
+        /// <returns>True if the input handler is viewing remains, false otherwise</returns>
         public bool viewingSomeRemains()
         {
             return remainsView != null;
         }
 
+        /// <summary>
+        /// Gets the tile the mouse if hovering over as an array of ints
+        /// </summary>
+        /// <returns>The tile the mouse if hovering over with the 0th element as the x location and the 1st element as the y location</returns>
         public int[] getTileLoc()
         {
             Vector2 loc = getMouseLocation();
@@ -248,6 +322,11 @@ namespace Genome
             return new int[] { (int)x, (int)y };
         }
 
+        /// <summary>
+        /// Updates the location in the world the top left of the viewing area is over, making sure the viewing are doesn't go over the edge of the world
+        /// </summary>
+        /// <param name="difX">The difference in the X part of the location</param>
+        /// <param name="difY">The difference in the Y part of the location</param>
         public void updateLocation(float difX, float difY)
         {
             difX *= 5;
@@ -278,6 +357,11 @@ namespace Genome
             }
         }
 
+        /// <summary>
+        /// Deals with what happens if parts of the viewing area are clicked
+        /// </summary>
+        /// <param name="x">The x location of the tile that was clicked</param>
+        /// <param name="y">The y location of the tile that was clicked</param>
         public void clicked(int x, int y)
         {
 #if DEBUG
@@ -328,7 +412,7 @@ namespace Genome
         }
 
         /// <summary>
-        /// Doubles the speed, up to 32x, or sets it to one if it is at 0
+        /// Doubles the speed, up to 64x, or sets it to one if it is at 0
         /// </summary>
         public void speedUp()
         {
@@ -343,6 +427,10 @@ namespace Genome
             
         }
 
+        /// <summary>
+        /// Gets the tiles visible in the World for drawing, cropping out the tiles that are not visible
+        /// </summary>
+        /// <returns>A 2d array of tiles that are visible based on the location and size of the viewing area</returns>
         public Tile[][] getTilesVisible()
         {
             float x = size.X / Display.getTileSize(); //number of tiles to display in each direction
@@ -394,6 +482,10 @@ namespace Genome
             }
         }
 
+        /// <summary>
+        /// Views a creature, sets viewing to be true and sets up the information viewing commands
+        /// </summary>
+        /// <param name="c">The Creature to be viewed</param>
         public void viewCreature(Creature c)
         {
             viewing = true;
@@ -403,12 +495,21 @@ namespace Genome
             creatureView = c;
         }
 
+        /// <summary>
+        /// Views a plant, sets viewing to be true and sets up the information viewing commands
+        /// </summary>
+        /// <param name="c">The Plant to be viewed</param>
         private void viewPlant(Plant p)
         {
             viewing = true;
             maxInfo = plantMaxInfo;
             plantView = p;
         }
+
+        /// <summary>
+        /// Views remains, sets viewing to be true and sets up the information viewing commands
+        /// </summary>
+        /// <param name="c">The Remains to be viewed</param>
         private void viewRemains(Remains r)
         {
             viewing = true;
@@ -416,6 +517,9 @@ namespace Genome
             remainsView = r;
         }
 
+        /// <summary>
+        /// Cancels views, sets viewing to be false and all the viewing variables etc. to be null
+        /// </summary>
         private void deView()
         {
             viewing = false;
@@ -429,26 +533,47 @@ namespace Genome
             buttons[5].setVisible(false);
         }
 
+        /// <summary>
+        /// Gets the creature being viewed
+        /// </summary>
+        /// <returns>The creature that is being viewed</returns>
         public Creature getCreature()
         {
             return creatureView;
         }
 
+        /// <summary>
+        /// Gets the plant being viewed
+        /// </summary>
+        /// <returns>The plant that is being viewed</returns>
         public Plant getPlant()
         {
             return plantView;
         }
 
+        /// <summary>
+        /// Gets the remains being viewed
+        /// </summary>
+        /// <returns>The remains that are being viewed</returns>
         public Remains getRemains()
         {
             return remainsView;
         }
 
+        /// <summary>
+        /// Gets the number of creatures still alive
+        /// </summary>
+        /// <returns>The number of creatures still alive based on the list of live creatures in the World</returns>
         public int getCreaturesAlive()
         {
             return world.getLiveCreatures().Count;
         }
 
+        /// <summary>
+        /// Gets an array of strings that contain information about the creature
+        /// </summary>
+        /// <param name="c">The creature to get information about</param>
+        /// <returns>An array of strings containing a set of information about the creature</returns>
         public string[] getCreatureInfo(Creature c)
         {
             string[] status = new string[1];
@@ -480,6 +605,11 @@ namespace Genome
             return status;
         }
 
+        /// <summary>
+        /// Gets an array of strings that contain information about the plant
+        /// </summary>
+        /// <param name="c">The plant to get information about</param>
+        /// <returns>An array of strings containing a set of information about the plant</returns>
         public string[] getPlantInfo(Plant p)
         {
             string[] status = new string[1];
@@ -490,6 +620,11 @@ namespace Genome
             return status;
         }
 
+        /// <summary>
+        /// Gets an array of strings that contain information about some remains
+        /// </summary>
+        /// <param name="c">The remains to get information about</param>
+        /// <returns>An array of strings containing a set of information about some remains</returns>
         public string[] getRemainsInfo(Remains r)
         {
             string[] status = new string[1];
@@ -500,11 +635,18 @@ namespace Genome
             return status;
         }
 
+        /// <summary>
+        /// Increments the number of the information to get with the get*Info methods or sets it to 0 if it is at a certain value
+        /// </summary>
         public void nextInfo()
         {
             dataViewed = (dataViewed + 1) % maxInfo;
         }
 
+        /// <summary>
+        /// Gets the seed of the world
+        /// </summary>
+        /// <returns>The seed of the world, an int</returns>
         public int getSeed()
         {
             return world.Seed;
