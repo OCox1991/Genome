@@ -38,10 +38,6 @@ namespace Genome
             get { return seed; }
         }
         private int creatureUpdated = 0;
-        private int numToUpdatePerTick = 10;
-
-        private long actSpeed = TimeSpan.TicksPerSecond/16;
-        private long timer;
         /// <summary>
         /// Starts a new world with a random seed, 3 overloads to allow the specifying of a seed, a list of creatures or both
         /// </summary>
@@ -112,7 +108,6 @@ namespace Genome
         /// </summary>
         public void setUpWorld()
         {
-            timer = 0;
             Vector2 TL = new Vector2(0, 150); //The top left of that area to actually draw the world in
             inputHandler = new WorldInputHandler(TL, new Vector2(1024 - TL.X, 768 - TL.Y), this);
             deadList = new Stack<Creature>();
@@ -404,18 +399,8 @@ namespace Genome
         {
             if (creatureUpdated < creatureList.Count)
             {
-                for (int i = 0; i < numToUpdatePerTick; i++)
-                {
-                    if (!(creatureUpdated < creatureList.Count))
-                    {
-                        i = numToUpdatePerTick + 1;
-                    }
-                    else
-                    {
-                        creatureList[creatureUpdated].tick();
-                        creatureUpdated++;
-                    }
-                }
+                creatureList[creatureUpdated].tick();
+                creatureUpdated++;
             }
             else
             {
@@ -587,21 +572,21 @@ namespace Genome
             }
             else if (c1 == null)
             {
-                val = -1;
+                val = 1;
             }
             else if (c2 == null)
             {
-                val = 1;
+                val = -1;
             }
             else
             {
                 if (c1.getSpeed() < c2.getSpeed())
                 {
-                    val = -1;
+                    val = 1;
                 }
                 else if (c1.getSpeed() > c2.getSpeed())
                 {
-                    val = 1;
+                    val = -1;
                 }
                 else
                 {
@@ -619,23 +604,21 @@ namespace Genome
         /// <param name="gameTime">The time since the update method was last called</param>
         public override void update(GameTime gameTime)
         {
-            int speed = inputHandler.getSpeed();
-            timer += gameTime.ElapsedGameTime.Ticks;
-            if (speed > 0 && timer > actSpeed / speed)
+            if (Simulation.getTargetGeneration() <= Simulation.getGeneration() && Simulation.getTargetGeneration() > 0)
             {
-                if (gameTime.IsRunningSlowly)
+                inputHandler.stop();
+            }
+            int speed = inputHandler.getSpeed();
+            if (speed > 0)
+            {
+                if (speed > creatureList.Count - creatureUpdated) //the number of creatures in the list left to update
                 {
-                    if (numToUpdatePerTick > 1)
-                    {
-                        numToUpdatePerTick /= 2;
-                    }
+                    speed = creatureList.Count - creatureUpdated + 1;
                 }
-                else
+                for (int i = 0; i < speed; i++)
                 {
-                    numToUpdatePerTick++;
+                    tick();
                 }
-                tick();
-                timer = 0;
             }
             inputHandler.update(gameTime);
         }

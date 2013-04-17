@@ -23,6 +23,7 @@ namespace Genome
         private List<Creature> aliveCreatures;
         private Stack<Creature> deadCreatures;
         private List<Creature> creatureList;
+        private List<Creature> childList;
         private List<Creature> top;
         private List<Creature> bottom;
 
@@ -46,6 +47,7 @@ namespace Genome
             numBred = 0;
             top = new List<Creature>();
             bottom = new List<Creature>();
+            childList = new List<Creature>();
             status = "Judging Creatures...";
         }
 
@@ -76,8 +78,9 @@ namespace Genome
                 }
                 //upon loop exit creatureList should be a list of creatures sorted by success in the world
                 total = creatureList.Count;
-                lowerFix = total / 100 * (100 - Simulation.getElimPercentage()); //find indexes for certain percentages of the list
-                upperFix = total / 100 * Simulation.getTopPercentage();
+                //find indexes for certain percentages of the list
+                lowerFix = total / 100 * (100 - Simulation.getElimPercentage()); //index to eliminate all after
+                upperFix = total / 100 * Simulation.getTopPercentage(); //index to treat all before as top
                 creatureList.RemoveRange(lowerFix, total - lowerFix);
 
                 for (int i = 0; i < upperFix; i++)
@@ -105,7 +108,7 @@ namespace Genome
                 else
                 {
                     Random rand = WorldState.RandomNumberGenerator;
-                    if (creatureList.Count < (Simulation.getPopulation() / 100) * Simulation.getTopPercentage())
+                    if (childList.Count < (Simulation.getPopulation() / 100) * Simulation.getTopPercentage())
                     {
                         int c1 = rand.Next(top.Count);
                         int c2 = rand.Next(top.Count);
@@ -118,10 +121,10 @@ namespace Genome
                         Creature creature1 = top[c1];
                         Creature creature2 = top[c2];
                         Creature child = new Creature(creature1.getDna().breedWith(creature2.getDna()));
-                        creatureList.Add(child);
+                        childList.Add(child);
 
                     }
-                    else if (creatureList.Count < Simulation.getPopulation())
+                    else if (childList.Count < Simulation.getPopulation())
                     {
                         int c1 = rand.Next(bottom.Count);
                         int c2 = rand.Next(bottom.Count);
@@ -134,7 +137,7 @@ namespace Genome
                         Creature creature1 = bottom[c1];
                         Creature creature2 = bottom[c2];
                         Creature child = new Creature(creature1.getDna().breedWith(creature2.getDna()));
-                        creatureList.Add(child);
+                        childList.Add(child);
                     }
                     status = "Breeding next generation: " + numBred + "/" + Simulation.getPopulation();
                     numBred++;
@@ -142,7 +145,7 @@ namespace Genome
             }
             else
             {
-                Simulation.judgingDone(creatureList);
+                Simulation.judgingDone(childList);
             }
 
         }
@@ -162,7 +165,7 @@ namespace Genome
             int c2Energy = (int)c2.getEnergy() * Simulation.getEnergyWeight(); ;
             if (c1Health + c1Energy > c2Health + c2Energy)
             {
-                ret = 1;
+                ret = -1;
             }
             else if (c1Health + c1Energy == c2Health + c2Energy)
             {
@@ -170,11 +173,11 @@ namespace Genome
                 int c2Stats = c2.getStatValue();
                 if (c1Stats > c2Stats)
                 {
-                    ret = 1;
+                    ret = -1;
                 }
                 else if (c2Stats < c1Stats)
                 {
-                    ret = -1;
+                    ret = 1;
                 }
                 else
                 {

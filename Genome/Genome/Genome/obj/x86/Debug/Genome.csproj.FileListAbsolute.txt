@@ -29,3 +29,8 @@ C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content
 C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Shapes.txt
 C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Clone.xnb
 C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Kill.xnb
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Content\Help\User Documentation for the Genome Project.docx
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Genome.exe.manifest
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Debug\Genome.application
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\obj\x86\Debug\Genome.exe.manifest
+C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\obj\x86\Debug\Genome.application

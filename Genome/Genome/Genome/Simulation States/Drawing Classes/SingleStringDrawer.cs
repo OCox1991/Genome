@@ -20,7 +20,6 @@ namespace Genome
         SimulationState state;
         SpriteFont font;
         SpriteBatch batch;
-        MenuButton b;
 
         /// <summary>
         /// Sets up the drawer, getting the font and spritebatch from the Display class and initialising the MenuButton
@@ -31,7 +30,6 @@ namespace Genome
             this.state = state;
             font = Display.getFont();
             batch = Display.getSpriteBatch();
-            b = new MenuButton(new Vector2(0, 0));
         }
 
         /// <summary>
@@ -40,7 +38,6 @@ namespace Genome
         /// </summary>
         public void draw()
         {
-            Display.drawButton(b);
             string s = state.ToString();
             float centreX = Display.getWindowWidth()/2 - (font.MeasureString(s).X / 2);
             float centreY = Display.getWindowHeight()/2 - (font.MeasureString(s).Y / 2);

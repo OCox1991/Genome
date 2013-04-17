@@ -38,7 +38,7 @@ namespace Genome
         private int initEnergy; //The energy the creature starts with (can be exceeded)
 
         private int strength; //The creature's strength, used in combat
-        private int speed; //The creature's speed, used to determine move order and successfully escape combat
+        private int speed; //The creature's speed, used to determine move order, if the creature can escape combat successfully, and the number of move actions the creature makes when moving towards something
         private int awareness; //The creature's awareness, how far it can see, used to counter stealth and determine sight radius
         private int defence; //The creature's defence, used in combat and to reduce damage taken
         private double diet; //The creature's diet from 1 () to 0 //TODO: get correct vals for this
@@ -97,10 +97,10 @@ namespace Genome
             //strength, speed, awareness, defence, stealthval
             //DEFAULT VALUES INITIALISATION
 
-            awareness = 10; //TODO: Make these modifiable (if time permits)
+            awareness = 10;
             initEnergy = 100;
             strength = 50;
-            speed = 50;
+            speed = 2;
             defence = 50;
             stealthVal = 50;
             maxHealth = 100;
@@ -155,12 +155,20 @@ namespace Genome
 
             //multiply some values to make them higher, eg energy should be around 1000 at default.
             initEnergy *= 100;
+
+            awareness -= awareness % 2;
             awareness /= 2;
 
             health = maxHealth;
             energy = initEnergy;
             maxStamina = energy / 10;
             stamina = maxStamina;
+
+            //Speed should always be 0 or greater
+            if (speed < 0)
+            {
+                speed = 0;
+            }
 
             decideBehaviours();
         }
@@ -685,7 +693,7 @@ namespace Genome
             Creature slowest = null;
             foreach (Creature c in creatures)
             {
-                int spd = c.getStrength();
+                int spd = c.getSpeed();
                 if (spd < lowestSpeed)
                 {
                     lowestSpeed = spd;
@@ -748,7 +756,7 @@ namespace Genome
             Creature hungriest = null;
             foreach (Creature c in creatures)
             {
-                int eng = c.getStrength();
+                int eng = c.getEnergy();
                 if (eng < lowestEnergy)
                 {
                     lowestEnergy = eng;
@@ -1032,7 +1040,7 @@ namespace Genome
             {
                 b = true;
             }
-            else if (!f.isPlant() && diet * 2 > 1)
+            else if (!f.isPlant() && diet * 2 >= 1) //Both use >= / <= since omnivores shouldn't really have any preference
             {
                 b = true;
             }
@@ -1120,7 +1128,7 @@ namespace Genome
         {
             if (isAdjacent(otherCreature))
             {
-                int winnerEnergy = 10; //TODO: make these editable
+                int winnerEnergy = 10;
                 int loserEnergy = 20;
 
                 otherCreature.attacked(this);
@@ -1224,7 +1232,12 @@ namespace Genome
         /// <param name="dir">The direction to move in</param>
         private void move(Direction dir)
         {
-            int energyCost = 40 / (speed / 20);
+            int energyDiv = speed / 2;
+            if (energyDiv < 1)
+            {
+                energyDiv = 1;
+            }
+            int energyCost = 20 / energyDiv; //speed + 1 is used to avoid divide by 0 errors.
             if (isStealthy())
             {
                 energyCost *= 2;
@@ -1248,7 +1261,14 @@ namespace Genome
             {
                 if (!surrounded())
                 {
-                    move(dir.right());
+                    if (random.Next(2) > 0)
+                    {
+                        move(dir.right());
+                    }
+                    else
+                    {
+                        move(dir.left());
+                    }
                 }
             }
         }
@@ -1267,8 +1287,14 @@ namespace Genome
                 }
                 outOfCombat();
             }
-            Direction d = getDirectionTo(thing);
-            move(d);
+            int i = 0;
+            int maxMoves = speed;
+            while(i < maxMoves && !isAdjacent(thing))
+            {
+                Direction d = getDirectionTo(thing);
+                move(d);
+                i++;
+            }
         }
 
         /// <summary>
@@ -1284,9 +1310,16 @@ namespace Genome
                     damage(inCombatWith.getStrength() - getDefence());
                 }
                 outOfCombat();
+            } 
+            int i = 0;
+            int maxMoves = speed;
+            while (i < maxMoves && !isAdjacent(thing))
+            {
+                Direction d = getDirectionTo(thing);
+                d = d.opposite();
+                move(d);
+                i++;
             }
-            Direction d = getDirectionTo(thing);
-            move(d.opposite());
         }
 
         /// <summary>
@@ -1327,6 +1360,10 @@ namespace Genome
             move(dir);
         }
 
+        /// <summary>
+        /// A routing method to decide on the creature's action, using a provided creature
+        /// </summary>
+        /// <param name="c">The creature to act upon</param>
         private void creatureAct(Creature c)
         {
             switch (behaviour[Scenario.CREATURE])

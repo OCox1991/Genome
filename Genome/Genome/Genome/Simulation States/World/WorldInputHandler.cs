@@ -416,7 +416,7 @@ namespace Genome
         /// </summary>
         public void speedUp()
         {
-            if (speed < 64 && speed > 0)
+            if (speed < 128 && speed > 0)
             {
                 speed *= 2;
             }
@@ -480,6 +480,14 @@ namespace Genome
             {
                 speed /= 2;
             }
+        }
+
+        /// <summary>
+        /// Stops the simulation, setting the speed to 0
+        /// </summary>
+        public void stop()
+        {
+            speed = 0;
         }
 
         /// <summary>

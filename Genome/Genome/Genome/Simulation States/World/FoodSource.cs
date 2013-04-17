@@ -34,7 +34,7 @@ namespace Genome
 
         /// <summary>
         /// Allows us to distinguish between the different types of food source, this will be overridden in the Plant subclass
-        /// to return true
+        /// to return true. More generally, can be used to specify food sources which are favoured by herbivores vs carnivores.
         /// </summary>
         /// <returns>False except in the Plant subclass</returns>
         public abstract bool isPlant();

@@ -39,7 +39,7 @@ namespace Genome
             }
             else
             {
-                Simulation.begin(creatures, r, seed);
+                Simulation.begin(creatures, seed);
             }
         }
 

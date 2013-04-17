@@ -69,6 +69,23 @@ namespace Genome
             return dir;
         }
 
+        public static Direction left(this Direction d)
+        {
+            Direction dir = Direction.NORTH;
+            switch (d)
+            {
+                case Direction.EAST: dir = Direction.NORTHEAST; break;
+                case Direction.NORTHEAST: dir = Direction.NORTH; break;
+                case Direction.NORTH: dir = Direction.NORTHWEST; break;
+                case Direction.NORTHWEST: dir = Direction.WEST; break;
+                case Direction.WEST: dir = Direction.SOUTHWEST; break;
+                case Direction.SOUTHWEST: dir = Direction.SOUTH; break;
+                case Direction.SOUTH: dir = Direction.SOUTHEAST; break;
+                case Direction.SOUTHEAST: dir = Direction.EAST; break;
+            }
+            return dir;
+        }
+
         /// <summary>
         /// Returns a random direction
         /// </summary>

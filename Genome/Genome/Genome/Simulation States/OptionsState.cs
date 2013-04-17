@@ -37,7 +37,6 @@ namespace Genome
             initialState.addOption(worldOption);
 
             BranchOption creatureOption = new BranchOption("Creature options", "Options related to how creatures live and behave", this);
-            //TODO: add allow move if costs health bool
             creatureOption.addOption(new IntLeafOption("Starving energy level", "The level of energy below which creatures will see themselves as starving, changing their behaviour", this, Simulation.getStarvingEnergyLevel, Simulation.setStarvingEnergyLevel));
             creatureOption.addOption(new IntLeafOption("Wounded energy level", "The level of health below which creatures will see themselves as wounded, changing their behaviour", this, Simulation.getWoundedHealthPercent, Simulation.setWoundedHealthPercent));
             creatureOption.addOption(new IntLeafOption("Energy drain per tick", "The amount of energy a creature will lost per tick, just by continuing to exist", this, Simulation.getEnergyDrainPerTick, Simulation.setEnergyDrainPerTick));
@@ -47,7 +46,6 @@ namespace Genome
             initialState.addOption(creatureOption);
 
             BranchOption judgingOption = new BranchOption("Judging & breeding options", "Options related to how the creatures are judged by the program and breeding them together", this);
-            //TODO: add ignore dead creatures bool
             judgingOption.addOption(new IntLeafOption("Mutation chance", "The chance of mutation, P(mutation) = 1/[This value]", this, Simulation.getMutationChance, Simulation.setMutationChance));
             judgingOption.addOption(new IntLeafOption("Energy weight", "How heavily the judging state values energy in creatures", this, Simulation.getEnergyWeight, Simulation.setEnergyWeight));
             judgingOption.addOption(new IntLeafOption("Health weight", "How heavily the judging state values health in creatures", this, Simulation.getHealthWeight, Simulation.setHealthWeight));
