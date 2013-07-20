@@ -1,0 +1,1 @@
+In order to run the program, either open it in visual studio and run it from there or install it using the installer and run it from the start menu.
