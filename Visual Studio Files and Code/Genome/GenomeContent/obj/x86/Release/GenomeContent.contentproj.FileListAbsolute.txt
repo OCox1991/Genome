@@ -1,1 +1,2 @@
 C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\GenomeContent\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\GenomeContent\obj\x86\Release\ResolveAssemblyReference.cache

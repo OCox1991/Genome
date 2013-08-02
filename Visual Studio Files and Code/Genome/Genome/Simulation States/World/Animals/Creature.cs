@@ -1237,7 +1237,7 @@ namespace Genome
             {
                 energyDiv = 1;
             }
-            int energyCost = 20 / energyDiv; //speed + 1 is used to avoid divide by 0 errors.
+            int energyCost = 20 / energyDiv; 
             if (isStealthy())
             {
                 energyCost *= 2;

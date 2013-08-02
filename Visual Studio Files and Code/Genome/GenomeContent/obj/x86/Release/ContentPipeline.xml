@@ -7,7 +7,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\BlankTile.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\BlankTile.xnb</Output>
       <Time>2013-02-12T22:52:13.130745+00:00</Time>
     </Item>
     <Item>
@@ -16,7 +16,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\Creature.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\Creature.xnb</Output>
       <Time>2013-03-09T06:21:27.0140035+00:00</Time>
     </Item>
     <Item>
@@ -25,7 +25,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\GameThumbnail.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\GameThumbnail.xnb</Output>
       <Time>2013-02-12T22:52:13.1437458+00:00</Time>
     </Item>
     <Item>
@@ -34,7 +34,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\Obstacle.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\Obstacle.xnb</Output>
       <Time>2013-02-12T22:52:13.148746+00:00</Time>
     </Item>
     <Item>
@@ -43,7 +43,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\Plant.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\Plant.xnb</Output>
       <Time>2013-02-12T22:52:13.1467459+00:00</Time>
     </Item>
     <Item>
@@ -52,7 +52,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\Remains.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\Remains.xnb</Output>
       <Time>2013-02-12T22:52:13.1507462+00:00</Time>
     </Item>
     <Item>
@@ -61,7 +61,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\MenuButton.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\MenuButton.xnb</Output>
       <Time>2013-03-05T21:53:13.650589+00:00</Time>
     </Item>
     <Item>
@@ -70,7 +70,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\minus.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\minus.xnb</Output>
       <Time>2013-03-05T21:53:13.6515891+00:00</Time>
     </Item>
     <Item>
@@ -79,7 +79,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\plus.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\plus.xnb</Output>
       <Time>2013-03-05T21:53:13.6535892+00:00</Time>
     </Item>
     <Item>
@@ -88,7 +88,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\TopMenu.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\TopMenu.xnb</Output>
       <Time>2013-03-09T05:46:30.6630991+00:00</Time>
     </Item>
     <Item>
@@ -97,7 +97,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\ViewingBack.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\ViewingBack.xnb</Output>
       <Time>2013-03-09T05:47:15.7296767+00:00</Time>
     </Item>
     <Item>
@@ -106,7 +106,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\PlantDep.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\PlantDep.xnb</Output>
       <Time>2013-03-09T06:12:30.8363359+00:00</Time>
     </Item>
     <Item>
@@ -115,7 +115,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\MoreInfoBtn.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\MoreInfoBtn.xnb</Output>
       <Time>2013-03-09T09:54:49.8832857+00:00</Time>
     </Item>
     <Item>
@@ -124,7 +124,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\BlankButton.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\BlankButton.xnb</Output>
       <Time>2013-03-14T08:41:16.7529166+00:00</Time>
     </Item>
     <Item>
@@ -133,7 +133,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\Options.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\Options.xnb</Output>
       <Time>2013-03-14T08:38:23.0669823+00:00</Time>
     </Item>
     <Item>
@@ -142,7 +142,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\Quit.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\Quit.xnb</Output>
       <Time>2013-03-14T08:38:45.598271+00:00</Time>
     </Item>
     <Item>
@@ -151,7 +151,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\Restart.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\Restart.xnb</Output>
       <Time>2013-03-14T08:38:00.2066748+00:00</Time>
     </Item>
     <Item>
@@ -160,7 +160,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\Resume.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\Resume.xnb</Output>
       <Time>2013-03-14T08:37:14.3880541+00:00</Time>
     </Item>
     <Item>
@@ -169,7 +169,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\BackButton.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\BackButton.xnb</Output>
       <Time>2013-03-17T15:20:49.1793939+00:00</Time>
     </Item>
     <Item>
@@ -178,7 +178,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\Clone.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\Clone.xnb</Output>
       <Time>2013-03-23T15:06:12.6323965+00:00</Time>
     </Item>
     <Item>
@@ -187,7 +187,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\Kill.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\Kill.xnb</Output>
       <Time>2013-03-23T15:03:56.7446242+00:00</Time>
     </Item>
     <Item>
@@ -196,7 +196,7 @@
       <Importer>FontDescriptionImporter</Importer>
       <Processor>FontDescriptionProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\SpriteFont.xnb</Output>
+      <Output>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\SpriteFont.xnb</Output>
       <Time>2013-03-07T00:47:14.3433454+00:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
@@ -205,10 +205,10 @@
       <TargetProfile>HiDef</TargetProfile>
       <BuildConfiguration>Release</BuildConfiguration>
       <CompressContent>true</CompressContent>
-      <RootDirectory>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\GenomeContent\</RootDirectory>
-      <LoggerRootDirectory>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\</LoggerRootDirectory>
-      <IntermediateDirectory>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\GenomeContent\obj\x86\Release\</IntermediateDirectory>
-      <OutputDirectory>C:\Users\Owen\Documents\GitHub\Genome\Genome\Genome\Genome\bin\x86\Release\Content\</OutputDirectory>
+      <RootDirectory>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\GenomeContent\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\GenomeContent\obj\x86\Release\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\Owen\Documents\GitHub\Genome\Visual Studio Files and Code\Genome\Genome\bin\x86\Release\Content\</OutputDirectory>
     </Settings>
     <Assemblies>
       <Assembly>

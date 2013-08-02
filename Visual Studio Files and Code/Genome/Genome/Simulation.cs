@@ -27,18 +27,18 @@ namespace Genome
 
         private static List<Shape> recognisedShapes = new List<Shape>();
 
-        private static int remainsFoodValue = 1500; //flat
-        private static int plantFoodValue = 750; //flat
+        private static int remainsFoodValue = 500; //flat
+        private static int plantFoodValue = 100; //flat
         private static int remainsFoodValueVariation = 2; //  +- (1/x)
         private static int plantFoodValueVariation = 2; // +- 1/x
-        private static int numTicksPlantRegrow = 750; //flat
-        private static int numTicksRemainsDecay = 500; //flat
-        private static int numFoodUnitsPlant = 3; //flat
-        private static int numFoodUnitsRemains = 4; //flat
+        private static int numTicksPlantRegrow = 300; //flat
+        private static int numTicksRemainsDecay = 300; //flat
+        private static int numFoodUnitsPlant = 75; //flat
+        private static int numFoodUnitsRemains = 75; //flat
 
-        private static int population = 100; //flat
-        private static int plantPop = 10000; //flat
-        private static int obstacleNumber = 25000; //flat
+        private static int population = 500; //flat
+        private static int plantPop = 1000; //flat
+        private static int obstacleNumber = 125000; //flat
 
         //judging
         private static int energyWeight = 2; //energy * x
@@ -47,7 +47,7 @@ namespace Genome
         private static int elimPercentage = 25; //bottom x% eliminated
 
         //creatures
-        private static int starvingEnergyLevel = 250; //flat
+        private static int starvingEnergyLevel = 5000; //flat
         private static int woundedHealthPercent = 15; //%age
 
         private static int energyDrainPerTick = 5; //flat
