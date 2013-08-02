@@ -27,14 +27,14 @@ namespace Genome
 
         private static List<Shape> recognisedShapes = new List<Shape>();
 
-        private static int remainsFoodValue = 500; //flat
+        private static int remainsFoodValue = 2500; //flat
         private static int plantFoodValue = 100; //flat
         private static int remainsFoodValueVariation = 2; //  +- (1/x)
         private static int plantFoodValueVariation = 2; // +- 1/x
         private static int numTicksPlantRegrow = 300; //flat
         private static int numTicksRemainsDecay = 300; //flat
         private static int numFoodUnitsPlant = 75; //flat
-        private static int numFoodUnitsRemains = 75; //flat
+        private static int numFoodUnitsRemains = 3; //flat
 
         private static int population = 500; //flat
         private static int plantPop = 1000; //flat

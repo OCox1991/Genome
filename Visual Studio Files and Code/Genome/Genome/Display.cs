@@ -19,7 +19,7 @@ namespace Genome
         private static Dictionary<TextureNames, Texture2D> textures = new Dictionary<TextureNames, Texture2D>();
         private static SpriteFont spriteFont;
         private static SpriteBatch spriteBatch;
-        private static bool drawCreaturesAsGenes = true;
+        private static bool drawCreaturesAsGenes = false;
 
         private Display()
         {
